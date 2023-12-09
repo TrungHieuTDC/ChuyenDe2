@@ -1,0 +1,505 @@
+{% load static %}
+{% load custom_filters %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <title>SocialV | Responsive Bootstrap 5 Admin Dashboard Template</title>
+      
+      <link rel="shortcut icon" href="{% static 'assets/images/favicon.ico' %}" />
+      <link rel="stylesheet" href="{% static 'assets/css/libs.min.css/' %}">
+      <link rel="stylesheet" href="{% static 'assets/css/socialv.css/' %}">
+      <link rel="stylesheet" href="{% static 'assets/vendor/@fortawesome/fontawesome-free/css/all.min.css' %}">
+      <link rel="stylesheet" href="{% static 'assets/vendor/remixicon/fonts/remixicon.css' %}">
+      <link rel="stylesheet" href="{% static 'assets/vendor/vanillajs-datepicker/dist/css/datepicker.min.css' %}">
+      <link rel="stylesheet" href="{% static 'assets/vendor/font-awesome-line-awesome/css/all.min.css' %}">
+      <link rel="stylesheet" href="{% static 'assets/vendor/line-awesome/dist/line-awesome/css/line-awesome.min.css' %}">
+      
+  </head>
+  <body class="  ">
+    <!-- loader Start -->
+    <div id="loading">
+          <div id="loading-center">
+          </div>
+    </div>
+    <!-- loader END -->
+    <!-- Wrapper Start -->
+    <div class="wrapper">
+      <div class="iq-sidebar sidebar-default ">
+          <div id="sidebar-scrollbar">
+              <nav class="iq-sidebar-menu">
+                  <ul id="iq-sidebar-toggle" class="iq-menu">
+                      <li class="active">
+                          <a href="{% url 'social_profile:newsfeed' %}" class=" "> 
+                              <i class="las la-newspaper"></i><span>Newsfeed</span>
+                          </a>
+                      </li>
+                      <li class="">
+                         <a href="{% url 'social_profile:profile' %}" class=" ">
+                             <i class="las la-user"></i><span>Profile</span>
+                             
+                          </a>
+                      </li>
+                      <li class=" ">
+                          <a href="#mailbox" data-bs-toggle="collapse" class="  collapsed" aria-expanded="false">
+                              <i class="ri-mail-line"></i><span>Group</span><i
+                                  class="ri-arrow-right-s-line iq-arrow-right"></i>
+                          </a>
+                          <ul id="mailbox" class="iq-submenu collapse" data-bs-parent="#iq-sidebar-toggle">
+                              <li class="">
+                                  <a href="{% url 'social_network:group'%}"><i class="  ri-inbox-line"></i>View Group</a>
+                              </li>
+                              <li class="">
+                                  <a href="/group_create/"><i class="ri-edit-line"></i>Create Group</a>
+                              </li>
+                              
+                              <li class="">
+                                <a href="{% url 'social_network:user_admin_groups' %}"><i class="ri-compasses-line"></i>Manage Group</a>
+                            </li>
+                           
+                          </ul>
+                      </li>
+                    
+                      <li class="">
+                          <a href="#pages" class="  collapsed" data-bs-toggle="collapse"
+                              aria-expanded="false"><i class="ri-pages-line"></i><span>Fanpage</span><i
+                                  class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                          <ul id="pages" class="iq-submenu collapse" data-bs-parent="#iq-sidebar-toggle">
+                              <li class="">
+                                 
+                                      <li class="">
+                                        <a href="{% url 'social_fanpage:fanpage_list' %}"><i class="  ri-inbox-line"></i>View Fanpage</a>
+                                      </li>
+                                      <li class="">
+                                        <a href="{% url 'social_fanpage:fanpage_create' %}"><i class="ri-edit-line"></i>Create Fanpage</a>
+                                      </li>
+                                  </ul>
+                              </li>
+                          
+                          </ul>
+                      </li>
+                  </ul>
+                  </nav>
+                  <div class="p-5"></div>
+              </div>
+          </div>
+      
+              <div class="iq-top-navbar">
+          <div class="iq-navbar-custom">
+              <nav class="navbar navbar-expand-lg navbar-light p-0">
+                  <div class="iq-navbar-logo d-flex justify-content-between">
+                      <a href="{% url 'social_network:index' %}">
+                          <img src="{% static 'assets/images/iduck_1.png' %}" class="img-fluid" alt="">
+                          <span>iDuck</span>
+                      </a>
+                      <div class="iq-menu-bt align-self-center">
+                          <div class="wrapper-menu">
+                              <div class="main-circle"><i class="ri-menu-line"></i></div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="iq-search-bar device-search">
+                      <form action="{% url 'social_network:search' %}" class="searchbox">
+                        <button style="border:none; background:none" class="search-link" ><i  style="color:#60B8FF"class="ri-search-line"></i></button>
+                          <input name="search" type="text" class="text search-input" placeholder="Search here...">
+                      </form>
+                  </div>
+                  <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                      data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                      aria-label="Toggle navigation">
+                      <i class="ri-menu-3-line"></i>
+                  </button>
+                  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                      <ul class="navbar-nav  ms-auto navbar-list">
+                          <li>
+                              <a href="{% url 'social_network:saved_posts' %}" class="  d-flex align-items-center">
+                                  <i class="ri-home-line"></i>
+                              </a>
+                          </li>
+                          <li class="nav-item dropdown">
+                               <a href="#" class="dropdown-toggle" id="group-drop" data-bs-toggle="dropdown"
+                                      aria-haspopup="true" aria-expanded="false"><i class="ri-group-line"></i></a>
+                              <div class="sub-drop sub-drop-large dropdown-menu" aria-labelledby="group-drop">
+                                  <div class="card shadow-none m-0">
+                                       <div class="card-header d-flex justify-content-between bg-primary">
+                                      <div class="header-title">
+                                      <h5 class="mb-0 text-white">Friend Request</h5>
+                                      </div>
+                                      <small class="badge  bg-light text-dark ">{{ friend_request.count }}</small>
+                                  </div>
+                                      <div class="card-body p-0">
+                                        {% for friend_request in friend_requests_received %}
+                                        <div class="iq-friend-request">
+                                            <div class="iq-sub-card iq-sub-card-big d-flex align-items-center justify-content-between">
+                                                <div class="d-flex align-items-center">
+                                                    <img class="avatar-40 rounded" src="{{ friend_request.user.profile.avatar.url }}" alt="">
+                                                    <div class="ms-3">
+                                                        <h6 class="mb-0">{{ friend_request.user.last_name }} {{ friend_request.user.first_name }}</h6>
+                                                        <p class="mb-0">{{ friend_request.user.profile.friends.count }} friends</p>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex align-items-center">
+                                                    <a href="{% url 'social_profile:accept_friend_request' friend_request.user.id %}" class="me-3 btn btn-primary rounded">Confirm</a>
+                                                    <a href="{% url 'social_profile:reject_friend_request' friend_request.user.id %}" class="me-3 btn btn-secondary rounded">Delete Request</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                       
+                                        {% endfor %}
+                                          <div class="text-center">
+                                              <a href="{% url 'social_profile:friend_request_list' %}" class=" btn text-primary">View More Request</a>
+                                          </div>
+                                      </div>
+                                      
+                                  </div>
+                              </div>
+                          </li>
+                          <li class="nav-item dropdown">
+                                    <a href="#" class="search-toggle   dropdown-toggle" id="notification-drop" data-bs-toggle="dropdown">
+                                        <i class="ri-notification-4-line"></i>
+                                    </a>
+                                    <div class="sub-drop dropdown-menu" aria-labelledby="notification-drop">
+                                        <div class="card shadow-none m-0">
+                                            <div class="card-header d-flex justify-content-between bg-primary">
+                                            <div class="header-title bg-primary">
+                                                        <h5 class="mb-0 text-white">All Notifications</h5>
+                                                        </div>
+                                                        <div id="notification-count" class="badge bg-light text-dark">
+
+                                                        </div>
+                                            </div>
+                                            <div class="card-body p-0">
+                                                <div id="notification-container" class="notification-container">
+                                                </div>
+                                            
+                                                {% for notification in notifications %}
+                                                    <a href="{% url 'social_network:post_detail' notification.post.id %}" class="iq-sub-card">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="">
+                                                                <img class="avatar-40 rounded" src="{{ notification.user_liker.profile.avatar.url }}" alt="">
+                                                            </div>
+                                                            <div class="ms-3 w-100">
+                                                                <h6 class="mb-0 ">{{ notification.user_liker.last_name }} liked
+                                                                    your post in {{ notification.group.name }} group</h6>
+                                                                <div class="">
+                                                                    <p class="mb-0"></p>
+                                                                    <small class="float-right font-size-12">{{ notification.created_at|custom_timesince }}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                {% endfor %}
+                                                <a href="{% url 'social_network:all_notifications' %}" class="" style="text-align: center; display: block;">
+                                                    <span>See all notification</span>
+                                                </a>
+                                        </div>
+                                    </div>
+                          </li>
+                          <li class="nav-item dropdown">
+                                    <a href="#" class="dropdown-toggle" id="mail-drop" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="ri-mail-line"></i>
+                                    </a>
+                                    <div class="sub-drop dropdown-menu" aria-labelledby="mail-drop">
+                                        <div class="card shadow-none m-0">
+                                              <div class="card-header d-flex justify-content-between bg-primary">
+                                            <div class="header-title bg-primary">
+                                                         <h5 class="mb-0 text-white">All Message</h5>
+                                                        </div>
+                                                    <small class="badge bg-light text-dark">4</small>
+                                                    </div>
+                                            <div class="card-body p-0 ">
+                                                {%for user in all_users%}
+                                                <a href="#" class="iq-sub-card">
+                                                    <div class="d-flex  align-items-center">
+                                                        <div class="">
+                                                            <img class="avatar-40 rounded" src="../assets/images/user/01.jpg" alt="">
+                                                        </div>
+                                                        <div class=" w-100 ms-3">
+                                                            <h6 class="mb-0 ">{{user.last_name}}</h6>
+                                                            <small class="float-left font-size-12">13 Jun</small>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                                {%endfor%}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                           <li class="nav-item dropdown">
+                              <a href="#" class="   d-flex align-items-center dropdown-toggle" id="drop-down-arrow" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  <img src="{{ request.user.profile.avatar.url }}" class="img-fluid rounded-circle me-3" alt="user">
+                                  <div class="caption">
+                                      <h6 class="mb-0 line-height">{{request.user.username}}</h6>
+                                  </div>
+                              </a>
+                              <div class="sub-drop dropdown-menu caption-menu" aria-labelledby="drop-down-arrow">
+                                  <div class="card shadow-none m-0">
+                                       <div class="card-header  bg-primary">
+                                          <div class="header-title">
+                                              <h5 class="mb-0 text-white">Hello {{request.user.last_name }}</h5>
+                                              <span class="text-white font-size-12">Available</span>
+                                          </div>
+                                      </div>
+                                      <div class="card-body p-0 ">
+                                          <a href="../app/profile.html" class="iq-sub-card iq-bg-primary-hover">
+                                              <div class="d-flex align-items-center">
+                                                  <div class="rounded card-icon bg-soft-primary">
+                                                      <i class="ri-file-user-line"></i>
+                                                  </div>
+                                                  <div class="ms-3">
+                                                      <h6 class="mb-0 ">My Profile</h6>
+                                                      <p class="mb-0 font-size-12">View personal profile details.</p>
+                                                  </div>
+                                              </div>
+                                          </a>
+                                          <a href="../app/profile-edit.html" class="iq-sub-card iq-bg-warning-hover">
+                                              <div class="d-flex align-items-center">
+                                                  <div class="rounded card-icon bg-soft-warning">
+                                                      <i class="ri-profile-line"></i>
+                                                  </div>
+                                                  <div class="ms-3">
+                                                      <h6 class="mb-0 ">Edit Profile</h6>
+                                                      <p class="mb-0 font-size-12">Modify your personal details.</p>
+                                                  </div>
+                                              </div>
+                                          </a>
+                                          <a href="../app/account-setting.html" class="iq-sub-card iq-bg-info-hover">
+                                              <div class="d-flex align-items-center">
+                                                  <div class="rounded card-icon bg-soft-info">
+                                                      <i class="ri-account-box-line"></i>
+                                                  </div>
+                                                  <div class="ms-3">
+                                                      <h6 class="mb-0 ">Account settings</h6>
+                                                      <p class="mb-0 font-size-12">Manage your account parameters.</p>
+                                                  </div>
+                                              </div>
+                                          </a>
+                                          <a href="../app/privacy-setting.html" class="iq-sub-card iq-bg-danger-hover">
+                                              <div class="d-flex align-items-center">
+                                                  <div class="rounded card-icon bg-soft-danger">
+                                                      <i class="ri-lock-line"></i>
+                                                  </div>
+                                                  <div class="ms-3">
+                                                      <h6 class="mb-0 ">Privacy Settings</h6>
+                                                      <p class="mb-0 font-size-12">Control your privacy parameters.
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                          </a>
+                                          <div class="d-inline-block w-100 text-center p-3">
+                                              <a class="btn btn-primary iq-sign-btn" href="/logout/" role="button">Sign
+                                                  out<i class="ri-login-box-line ms-2"></i></a>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </li>
+                      </ul>               
+                  </div>
+              </nav>
+          </div>
+      </div>       <div class="right-sidebar-mini right-sidebar">
+           <div class="right-sidebar-panel p-0">
+              <div class="card shadow-none">
+                 <div class="card-body p-0">
+                    <div class="media-height p-3" data-scrollbar="init">
+                       <div class="d-flex align-items-center mb-4">
+                          <div class="iq-profile-avatar status-online">
+                             <img class="rounded-circle avatar-50" src="{% static 'assets/images/user/01.jpg' %}" alt="">
+                          </div>
+                          <div class="ms-3">
+                             <h6 class="mb-0">Anna Sthesia</h6>
+                             <p class="mb-0">Just Now</p>
+                          </div>
+                       </div>
+                       
+                    </div>
+                    <div class="right-sidebar-toggle bg-primary text-white mt-3">
+                       <i class="ri-arrow-left-line side-left-icon"></i>
+                       <i class="ri-arrow-right-line side-right-icon"><span class="ms-3 d-inline-block">Close Menu</span></i>
+                    </div>
+                 </div>
+              </div>
+           </div>
+        </div>       <div id="content-page" class="content-page">
+         {% block body %}
+
+         {% endblock %}
+         
+    <footer class="iq-footer bg-white mt-5">
+       
+    </footer>   
+    <!-- Backend Bundle JavaScript -->
+    <script src="{% static 'assets/js/libs.min.js' %}"></script>
+    <!-- slider JavaScript -->
+    <script src="{% static 'assets/js/slider.js' %}"></script>
+    <!-- masonry JavaScript --> 
+    <script src="{% static 'assets/js/masonry.pkgd.min.js' %}"></script>
+    <!-- SweetAlert JavaScript -->
+    <script src="{% static 'assets/js/enchanter.js' %}"></script>
+    <!-- SweetAlert JavaScript -->
+    <script src="{% static 'assets/js/sweetalert.js' %}"></script>
+    <!-- app JavaScript -->
+    <script src="{% static 'assets/js/charts/weather-chart.js' %}"></script>
+    <script src="{% static 'assets/js/app.js' %}"></script>
+    <script src="{% static 'assets/js/lottie.js' %}"></script>
+
+    <!-- offcanvas start -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const likeForms = document.querySelectorAll(".like-form"); 
+            likeForms.forEach(form => {
+                form.addEventListener("submit", function (event) {
+                    event.preventDefault();
+                    const postID = this.querySelector('input[name="post_id"]').value;
+                    const csrfToken = this.querySelector('input[name="csrfmiddlewaretoken"]').value;
+                    const likeButton = this.querySelector('.like-button');
+        
+                    let isLiked = likeButton.classList.contains('liked');
+                    const likeCountElement = this.querySelector('.like-count');
+        
+                    fetch("/like_post/", {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": csrfToken
+                        },
+                        body: new URLSearchParams({ post_id: postID, is_liked: isLiked }),
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message) {
+                                if (isLiked) {
+                                    likeButton.classList.remove('liked');
+                                    likeCountElement.textContent = data.likes;
+                                } else {
+                                    likeButton.classList.add('liked');
+                                    likeCountElement.textContent = data.likes;
+        
+                                    // Update the notification section with the new notification HTML
+                                    if (data.notification_html) {
+                                        const notificationContainer = document.getElementById('notification-container');
+        
+                                        // Check if the logged-in user is the owner of the post
+                                        if (data.is_owner) {
+                                            notificationContainer.querySelector('.notification-section').insertAdjacentHTML('afterbegin', data.notification_html);
+                                        }
+                                    }
+                                }
+                            } else {
+                                console.error(data.error);
+                            }
+                        })
+                        .catch(error => console.error('Fetch error:', error));
+                });
+            });
+        });
+        
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            function fetchNotifications() {
+
+                fetch("/get_notifications/")
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Received notifications:', data.notifications);
+                        updateUI(data.notifications,data.notification_count);
+                    })
+                    .catch(error => console.error('Fetch error:', error));
+            }
+        
+            function updateUI(notifications,notification_count) {
+                const notificationCountElement = document.getElementById('notification-count');
+                const notificationContainer = document.getElementById('notification-container');
+                notificationCountElement.textContent = `${notification_count}`;
+            
+                notifications.forEach(notification => {
+                    const postDetailUrl = `/post_detail/${notification.post_id}/`;
+                    const createdAt = new Date(notification.created_at);
+                    const formattedTime = timeSince(createdAt);
+                    const notificationHtml = `
+                    <a href="${postDetailUrl}" style="color: gray">
+                        <div class="iq-sub-card">
+                            <!-- Your existing HTML structure for displaying notifications -->
+                            <div class="d-flex align-items-center">
+                                <div class="">
+                                    <img class="avatar-40 rounded" src="${notification.avatar}" alt="">
+                                </div>
+                                <div class="ms-3 w-100">
+                                    <h6 class="mb-0">${notification.user_liker_last_name} do action
+                                        ${notification.post_content} in ${notification.group_name} group</h6>
+                                    <div class="">
+                                        <p class="mb-0"></p>
+                                        <small class="float-right font-size-12">${formattedTime}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>`
+                        ;
+        
+                    notificationContainer.insertAdjacentHTML('beforeend', notificationHtml);
+                });
+            }
+        
+            // Fetch notifications every 60 seconds (adjust as needed)
+            setInterval(fetchNotifications, 3000);
+        });
+    </script>
+    <script>
+        function timeSince(date) {
+            const now = new Date();
+            const timeDifference = now - date;
+            const seconds = Math.floor(timeDifference / 1000);
+        
+            if (timeDifference < 60000) {  // Less than 1 minute
+                return "Just now";
+            } else if (seconds < 3600) {  // Less than 1 hour
+                const minutes = Math.floor(seconds / 60);
+                return `${minutes} minute${minutes === 1 ? '' : 's'} `;
+            } else if (now.getDate() === date.getDate()) {  // Today
+                return "Today";
+            } else {
+                const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+                return `${days} minute${days === 1 ? '' : 's'} `;
+            }
+        }
+    </script>
+    <div class="offcanvas offcanvas-bottom share-offcanvas" tabindex="-1" id="share-btn" aria-labelledby="shareBottomLabel">
+       <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="shareBottomLabel">Share</h5>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+       </div>
+       <div class="offcanvas-body small">
+          <div class="d-flex flex-wrap align-items-center">
+             <div class="text-center me-3 mb-3">
+                <img src="../assets/images/icon/08.png" class="img-fluid rounded mb-2" alt="">
+                <h6>Facebook</h6>
+             </div>
+             <div class="text-center me-3 mb-3">
+                <img src="../assets/images/icon/09.png" class="img-fluid rounded mb-2" alt="">
+                <h6>Twitter</h6>
+             </div>
+             <div class="text-center me-3 mb-3">
+                <img src="../assets/images/icon/10.png" class="img-fluid rounded mb-2" alt="">
+                <h6>Instagram</h6>
+             </div>
+             <div class="text-center me-3 mb-3">
+                <img src="../assets/images/icon/11.png" class="img-fluid rounded mb-2" alt="">
+                <h6>Google Plus</h6>
+             </div>
+             <div class="text-center me-3 mb-3">
+                <img src="../assets/images/icon/13.png" class="img-fluid rounded mb-2" alt="">
+                <h6>In</h6>
+             </div>
+             <div class="text-center me-3 mb-3">
+                <img src="../assets/images/icon/12.png" class="img-fluid rounded mb-2" alt="">
+                <h6>YouTube</h6>
+             </div>
+          </div>
+       </div>
+    </div>
+  </body>
+</html>

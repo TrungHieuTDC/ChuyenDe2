@@ -1,0 +1,42 @@
+{% extends 'society/index.html' %}
+{% block body %}
+{% load custom_filters %}
+{% load static %}
+<div id="content-page" class="content-page">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <div class="header-title">
+                        <h4 class="card-title">Edit Education</h4>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="acc-edit">
+                        <form method="post" action="{% url 'social_profile:edit_places_user' places_user.id %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                            <label for="uname" class="form-label">City name:</label>
+                            <input name="city" value="{{ places_user.city }}" type="text" class="form-control" id="uname" placeholder="Enter your city...">
+                            </div>
+                            <div class="form-group">
+                            <label for="email" class="form-label">District name:</label>
+                            <input name="district" type="text" value="{{ places_user.district }}" class="form-control" id="email" placeholder="Enter your district...">
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="dob" class="form-label">Graduation year:</label>
+                                
+                                <input type="number" value="{{ places_user.year_lived }}" name="year_lived" class="form-control" id="year" placeholder="yyyy" />                            </div>
+                            <button onclick="return confirm('Are you sure you want to save?')" type="submit" class="btn btn-primary me-2">Submit</button>
+                            <button type="reset" class="btn bg-soft-danger">Cancle</button>
+                        </form>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+      </div>
+    </div>
+{%endblock%}

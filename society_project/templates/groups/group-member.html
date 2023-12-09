@@ -1,0 +1,99 @@
+{% extends 'society/index.html' %}
+{% block body %}
+{% load custom_filters %}
+<style>
+  .button-container {
+    display: flex; 
+    gap: 10px; 
+  }
+</style>
+<div class="container mt-3">
+  <div class="col-sm-12">
+    <div class="card position-relative inner-page-bg bg-primary" style="height: 150px;">
+       <div class="inner-page-title ">
+          <h3 class="text-white">Member in the group</h3>
+          <a href="{% url 'social_network:group_detail' group.slug %}" class="text-white" style="display: block; margin-top: 10px;">Back to group</a>
+       </div>
+    </div>
+  </div>
+</div>
+<div class="container mt-4">
+<p><b>Admin in group</b></p>
+{% for admin in group.admins.all  %}
+  <div class="col-md-12">
+    <div class="card">
+        <div class="card-body p-0">
+            <ul class="todo-task-lists m-0 p-0">
+            <li class="d-flex align-items-center p-3">
+                <div class="user-img img-fluid"><img src="{{ admin.profile.avatar.url }}" alt="story-img" class="rounded-circle avatar-40"></div>
+                      <div class="d-flex align-items-center justify-content-between w-100">
+                    <div class="ms-3">
+                      <a href="{% url 'social_profile:view_profile_user' admin.id %}" >
+                        <h6 class="d-inline-block">{{ admin.last_name }} {{ admin.first_name }}</h6>
+                      </a>
+                    </div>
+                    <div class="button-container">
+                      <a class="btn-success" href="{% url 'social_profile:send_friend_request' admin.id %}">Add Friend</a>
+                    </div>
+               </div>
+            </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+<hr>
+<div class="container mt-4">
+    <p><b>Member in group</b></p>
+{% for member in members  %}
+  <div class="col-md-12">
+    <div class="card">
+        <div class="card-body p-0">
+            <ul class="todo-task-lists m-0 p-0">
+            <li class="d-flex align-items-center p-3">
+                <div class="user-img img-fluid"><img src="{{ member.user.profile.avatar.url }}" alt="story-img" class="rounded-circle avatar-40"></div>
+                      <div class="d-flex align-items-center justify-content-between w-100">
+                    <div class="ms-3">
+                      <a href="{% url 'social_profile:view_profile_user' member.user.id %}" >
+                        <h6 class="d-inline-block">{{ member.user.last_name }} {{ member.user.first_name }}</h6>
+                        <a>
+                        <p class="mb-0">Join in {{ member.joined_at|custom_timesince }}</p>
+                    </div>
+                    {% if request.user in group.admins.all %}
+                    <div class="button-container">
+                      {% if member.status != "banned"%}
+                        <form method="post" action="{% url 'social_network:ban_member' %}">
+                          {% csrf_token %}
+                          <input type="hidden" name="membership_id" value="{{ member.id }}">
+                          <button onclick="return confirm('Are you sure you want to ban this member?')" class= "btn-warning " type="submit">Ban member</button>
+                        </form>
+                      {%else%}
+                      <form method="post" action="{% url 'social_network:unban_member' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="membership_id" value="{{ member.id }}">
+                        <button  onclick="return confirm('Are you sure you want to unban this member?')" class= "btn-warning " type="submit">Unban member</button>
+                      </form>
+                      {% endif %}
+                        <form method="post" action="{% url 'social_network:kick_member' %}">
+                          {% csrf_token %}
+                          <input type="hidden" name="membership_id" value="{{ member.id }}">
+                          <button class= "btn-danger" type="submit" onclick="return confirm('Are you sure you want to kick this member?')">Kick member </button>
+                        </form>
+                    </div>
+                    {%else%}
+                    <div class="button-container">   
+                      <a class="btn-success" href="{% url 'social_profile:send_friend_request' member.user.id %}">Add Friend</a>
+                    </div>
+                    {%endif%}
+
+               </div>
+            </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+
+{% endblock %}

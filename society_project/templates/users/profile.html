@@ -1,0 +1,2539 @@
+{% extends 'society/index.html' %}
+{% block body %}
+{% load custom_filters %}
+{% load static %}
+<style>
+   .like-form {
+       display: flex; 
+       align-items: center; 
+   }
+   .reply {
+       margin-bottom: 10px;
+   }
+   .comment-main {
+       display: inline-block;
+       vertical-align: middle;
+       max-width: 80%;
+       background-color: rgb(240, 242, 245);
+       border-radius: 8px;
+       padding: 5px;
+   }
+   .reply-content {
+       display: inline-block;
+       vertical-align: middle;
+       max-width: 80%;
+       background-color: rgb(240, 242, 245);
+       border-radius: 8px;
+       padding: 5px;
+       
+   }
+   .like-button {
+      
+       background-image: url("{% static 'assets/images/iduck_1.png' %}"); 
+       background-size: contain;
+       background-color: white;
+       width: 30px;
+       height: 30px;
+       border: none;
+       outline: none;
+       cursor: pointer;
+   }
+   .like-count {
+       margin-left: 5px; 
+   }
+   #preview-container {
+   display: flex;
+   flex-wrap: wrap;
+ }
+ .preview-image-container {
+ position: relative;
+ display: inline-block;
+}
+ .preview-image {
+   max-width: 90px; 
+   max-height: 70px;
+   float: left; 
+   margin: 10px; 
+   position: relative; 
+ }
+ 
+ .close-button {
+ position: absolute;
+ top: 10px;
+ right: 10px;
+ color: white;
+ background:red;
+ padding: 3px;
+ cursor: pointer;
+}
+.delete-post {
+ background: none;
+ border: none; 
+}
+.video-container {
+   width: 280;  
+   height: 200; 
+}
+</style>  
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha384-wvdapdduFvMlSl5U7F8p8pB2MU7PpsSO4Z8uvDJo7cBbPxJ0JtRU1AZQaD8Ue8Zv" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<div id="content-page" class="content-page">
+<div class="container">
+   <div class="row">
+      <div class="col-sm-12">
+         <div class="card">
+            <div class="card-body profile-page p-0">
+               <div class="profile-header">
+                  <div class="position-relative">
+                    {% if request.user.profile.background_avatar.url != null%}
+                     <img id="profile-pic-background" style="width: 984px; height: 246px" src="{{ request.user.profile.background_avatar.url }}" alt="profile-bg" class="rounded img-fluid">
+                    {% else%}
+                    <img id="profile-pic-background" style="width: 984px; height: 246px" src="{% static 'assets/images/page-img/profile-bg1.jpg' %}" alt="profile-bg" class="rounded img-fluid">
+                    {%endif%}
+                  </div>
+                  <div class="user-detail text-center mb-3">
+                     <div class="profile-img">
+                        <img style="width:150px; height:150px; border:none" src="{{ user.profile.avatar.url }}" alt="profile-img" class="avatar-130 img-fluid" />
+                     </div>
+                     <div class="profile-detail">
+                        <h3 class="">{{ user.last_name }}</h3>
+                     </div>
+                  </div>
+                  <div class="profile-info p-3 d-flex align-items-center justify-content-between position-relative">
+                     <div class="social-links">
+                         <ul class="social-data-block d-flex align-items-center justify-content-between list-inline p-0 m-0">
+                             <li class="text-center pe-3">
+                                 <a href="#"><img src="{% static 'assets/images/icon/08.png' %}" class="img-fluid rounded" alt="facebook"></a>
+                             </li>
+                             <li class="text-center pe-3">
+                                 <a href="#"><img src="{% static 'assets/images/icon/09.png' %}" class="img-fluid rounded" alt="Twitter"></a>
+                             </li>
+                             <li class="text-center pe-3">
+                                 <a href="#"><img src="{% static 'assets/images/icon/10.png' %}" class="img-fluid rounded" alt="Instagram"></a>
+                             </li>
+                             <li class="text-center pe-3">
+                                 <a href="#"><img src="{% static 'assets/images/icon/11.png' %}" class="img-fluid rounded" alt="Google plus"></a>
+                             </li>
+                             <li class="text-center pe-3">
+                                 <a href="#"><img src="{% static 'assets/images/icon/12.png' %}" class="img-fluid rounded" alt="You tube"></a>
+                             </li>
+                             <li class="text-center md-pe-3 pe-0">
+                                 <a href="#"><img src="{% static 'assets/images/icon/13.png' %}" class="img-fluid rounded" alt="linkedin"></a>
+                             </li>
+                         </ul>
+                     </div>
+                 </div>
+               </div>
+            </div>
+         </div>
+         <div class="card">
+            <div class="card-body p-0">
+               <div class="user-tabing">
+                  <ul class="nav nav-pills d-flex align-items-center justify-content-center profile-feed-items p-0 m-0">
+                     <li class="nav-item col-12 col-sm-3 p-0">
+                        <a class="nav-link active" href="#pills-timeline-tab" data-bs-toggle="pill" data-bs-target="#timeline" role="button">Timeline</a>
+                     </li>
+                     <li class="nav-item col-12 col-sm-3 p-0">
+                        <a class="nav-link" href="#pills-about-tab" data-bs-toggle="pill" data-bs-target="#about" role="button">About</a>
+                     </li>
+                     <li class="nav-item col-12 col-sm-3 p-0">
+                        <a class="nav-link" href="#pills-friends-tab" data-bs-toggle="pill" data-bs-target="#friends" role="button">Friends</a>
+                     </li>
+                     <li class="nav-item col-12 col-sm-3 p-0">
+                        <a class="nav-link" href="#pills-photos-tab" data-bs-toggle="pill" data-bs-target="#photos" role="button">Photos</a>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="col-sm-12">
+         <div class="tab-content">
+            <div class="tab-pane fade show active" id="timeline" role="tabpanel">
+               <div class="card-body p-0">
+                  <div class="row">
+                     <div class="col-lg-4">
+                        <div class="card">
+                           <div class="card-header d-flex justify-content-between">
+                              <div class="header-title">
+                                 <h4 class="card-title">Introduce </h4>
+                              </div>
+                           </div>
+                           <div class="card-body">
+                              <div class="row">
+                                 <div class="col-sm-12">
+                                    <div class="event-post position-relative">
+                                          <div class="job-icon-position">   
+                                       </div>
+                                       <div class="card-body  p-2">
+                                        <ul class="list-inline p-0 m-0">
+                                            <li class="mb-2 d-flex align-items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="16" width="18" viewBox="0 0 576 512"><!--!Font Awesome Free 6.5.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/></svg>
+                                                <p style="margin-left: 17px" class="mb-0">{{ user.profile.bio }}</p>
+                                            </li>
+                                            <li class="mb-2 d-flex align-items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/></svg>
+                                                <p style="margin-left: 17px" class="mb-0">{{ user.profile.marital }}</p>
+                                            </li>
+                                            <li class="mb-2 d-flex align-items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="16" width="20" viewBox="0 0 640 512"><!--!Font Awesome Free 6.5.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M480 48c0-26.5-21.5-48-48-48H336c-26.5 0-48 21.5-48 48V96H224V24c0-13.3-10.7-24-24-24s-24 10.7-24 24V96H112V24c0-13.3-10.7-24-24-24S64 10.7 64 24V96H48C21.5 96 0 117.5 0 144v96V464c0 26.5 21.5 48 48 48H304h32 96H592c26.5 0 48-21.5 48-48V240c0-26.5-21.5-48-48-48H480V48zm96 320v32c0 8.8-7.2 16-16 16H528c-8.8 0-16-7.2-16-16V368c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16zM240 416H208c-8.8 0-16-7.2-16-16V368c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16zM128 400c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V368c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32zM560 256c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H528c-8.8 0-16-7.2-16-16V272c0-8.8 7.2-16 16-16h32zM256 176v32c0 8.8-7.2 16-16 16H208c-8.8 0-16-7.2-16-16V176c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16zM112 160c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V176c0-8.8 7.2-16 16-16h32zM256 304c0 8.8-7.2 16-16 16H208c-8.8 0-16-7.2-16-16V272c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32zM112 320H80c-8.8 0-16-7.2-16-16V272c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16zm304-48v32c0 8.8-7.2 16-16 16H368c-8.8 0-16-7.2-16-16V272c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16zM400 64c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H368c-8.8 0-16-7.2-16-16V80c0-8.8 7.2-16 16-16h32zm16 112v32c0 8.8-7.2 16-16 16H368c-8.8 0-16-7.2-16-16V176c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16z"/></svg>
+                                                <p style="margin-left: 13px" class="mb-0">{{ places_user_latest.city }}</p>
+                                            </li>
+                                         </ul>
+                                       </div>
+                                    </div>
+                                 </div>
+                               
+                              </div>
+                           </div>
+                        </div>
+                        <div class="card">
+                           <div class="card-header d-flex justify-content-between">
+                              <div class="header-title">
+                                 <h4 class="card-title">Photos {{images_in_album.count}}</h4>
+                              </div>
+                              
+                           </div>
+                           <div class="card-body">
+                            
+                              <ul class="profile-img-gallary p-0 m-0 list-unstyled">
+                                {% for image in images_in_album %}
+                                 <li class="">
+                                    <a href="{% url 'social_profile:post_detail_user' image.id %}">
+                                        <img src="{{ image.image.url }}" alt="gallary-image" class="img-fluid" />
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                           </div>
+                        </div>
+                        <div class="card">
+                           <div class="card-header d-flex justify-content-between">
+                              <div class="header-title">
+                                 <h4 class="card-title">Friends</h4>
+                              </div>
+                              
+                           </div>
+                          
+                           <div class="card-body">
+                              <ul class="profile-img-gallary p-0 m-0 list-unstyled">
+                                {% for friend in friends %}
+                                 <li class="">
+                                    <a href="{% url 'social_profile:view_profile_user' friend.user.id %}">
+                                    <img src="{{ friend.user.profile.avatar.url }}" alt="gallary-image" class="img-fluid" /></a>
+                                    <h6 class="mt-2 text-center">{{ friend.user.last_name }}</h6>
+                                 </li>
+                                 {% endfor %}
+                              </ul> 
+                           </div>
+                           
+                          
+                        </div>
+                     </div>
+                     <div class="col-lg-8">
+                        <div id="post-modal-data" class="card">
+                           <div class="card-header d-flex justify-content-between">
+                              <div class="header-title">
+                                 <h4 class="card-title">Create Post</h4>
+                              </div>
+                           </div>
+                           <div class="card-body">
+                              <div class="d-flex align-items-center">
+                                 <div class="user-img">
+                                    <img src="{{ user.profile.avatar.url }}" alt="userimg" class="avatar-60 rounded-circle">
+                                 </div>
+                                 <form class="post-text ms-3 w-100 "  data-bs-toggle="modal" data-bs-target="#post-modal" action="#">
+                                    <input type="text" class="form-control rounded" placeholder="Write something here..." style="border:none;">
+                                 </form>
+                              </div>
+                              <hr>
+                           </div>
+                           <div class="modal fade" id="post-modal" tabindex="-1"  aria-labelledby="post-modalLabel" aria-hidden="true" >
+                              <div class="modal-dialog   modal-fullscreen-sm-down">
+                                 <div class="modal-content">
+                                    <div class="modal-header">
+                                       <h5 class="modal-title" id="post-modalLabel">Create Post</h5>
+                                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="ri-close-fill"></i></button>
+                                    </div>
+                                    <div class="modal-body">
+                                       <div class="d-flex align-items-center">
+                                          <div class="user-img">
+                                             <img src="{{ user.profile.avatar.url }}" alt="userimg" class="avatar-60 rounded-circle img-fluid">
+                                          </div>
+                                        <form method="post" action="{% url 'social_profile:post_user' %}" enctype="multipart/form-data" class="post-text ms-3 w-100 "   >
+                                            {% csrf_token %}
+                                                <input type="text"  id="content" name="content" class="form-control rounded" placeholder="Write something here..." style="border:none;">            
+                                        </div>
+                                       <hr>
+                                       <ul class="d-flex flex-wrap align-items-center list-inline m-0 p-0">
+                                          <li class="col-md-6 mb-3">
+                                             <div class="bg-soft-primary rounded p-2 pointer me-3">
+                                                <label for="file-input" >
+                                                    <img src="{% static 'assets/images/small/07.png' %}" alt="icon" class="img-fluid"> Photo
+                                                </label>
+                                                <input type="file" name="image" id="file-input" style="display: none;" multiple>   
+                                                
+                                            </div>
+                                            
+                                          </li>
+                                          <li class="col-md-6 mb-3">
+                                            <div class="bg-soft-primary rounded p-2 pointer me-3">
+                                            <label for="video">
+                                                <img src="{% static 'assets/images/small/07.png' %}" alt="icon" class="img-fluid">
+                                                <a href="#" id="open-video-selector">Video</a>
+                                            </label>
+                                        </div>
+                                            <input type="file" name="video" multiple style="display: none;" accept="video/*" id="video-input">
+                                        </li>
+                                       </ul>
+                                       <hr>
+                                       <h6>Your file</h6>
+                                       <div class="other-option">
+                                          <div class="d-flex align-items-center justify-content-between">
+                                             <div class="d-flex align-items-center">
+                                                <div class="user-img me-3">      
+                                                   <div id="preview-container" class="image-size">
+                                                   
+                                                   </div>
+                                                   
+                                                </div>          
+                                             </div>                
+                                          </div>
+                                       </div>
+                                       <label for="privacy">Privacy:</label>
+                                        <select name="privacy" id="privacy">
+                                            <option value="public">Public</option>
+                                            <option value="friend">Friends Only</option>
+                                            <option value="private">Private</option>
+                                        </select>
+                                       <button type="submit" class="btn btn-primary d-block w-100 mt-3">Post</button>
+                                    </form>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                       </div>
+                        <div class="card">
+                           <div class="card-body">
+                              {% for post in all_posts %}
+                              {% if post|is_friend_post %}                        
+                              <div class="post-item" id="post-{{ post..post.id }}">
+                                 <div class="user-post-data py-3">
+                                     <div class="d-flex justify-content-between">
+                                         <div class=" me-3">
+                                             <img class="rounded-circle " width="52px" height="52px" src="{{ post.user.profile.avatar.url }}" alt="">
+                                         </div>
+                                         <div class="w-100">
+                                             <div class="d-flex justify-content-between">
+                                                 <div class="">
+                                                     <h5 class="mb-0 d-inline-block">
+                                                         <a href="{% url 'social_profile:view_profile_user' post.user.id %}">{{ post.user.last_name }}
+                                                            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg>
+                                                         </a>
+                                                         <a href="{% url 'social_profile:view_profile_user' post.friend_user.id %}">{{ post.friend_user.last_name }}</a>
+                                                     </h5>
+                                                     <div style="display: flex; align-items: center;">
+                                                        {% if post.privacy == 'public' %}
+                                                            <i class="fas fa-globe" title="Public"></i>
+                                                        {% elif post.privacy == 'private' %}
+                                                            <i class="fas fa-lock" title="Private"></i>
+                                                        {% elif post.privacy == 'friend' %}
+                                                            <i class="fas fa-user-friends" title="Friend"></i>
+                                                        {% endif %}
+                                                         <p style="margin-left: 3.5px" class="mb-0" > {{ post.created_at|custom_timesince }}</p>
+                                                     </div>
+                                                 </div>
+ 
+                                                 <div class="card-post-toolbar">
+                                                     <div class="dropdown">
+                                                         <span class="dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                                                         <i class="ri-more-fill"></i>
+                                                         </span>
+                                                         <div class="dropdown-menu m-0 p-0">
+                                                            <a class="dropdown-item p-3" href="{% url 'social_profile:save_post_user' post.id %}">
+                                                                 <div class="d-flex align-items-top">
+                                                                 <i class="ri-save-line h4"></i>
+                                                                 <div class="data ms-2">
+                                                                     <button  class="delete-post" type="button">Save Post</button>
+                                                                     <p class="mb-0">Add this to your saved items</p>
+                                                                 </div>
+                                                                 </div>
+                                                             </a>
+                                                             {% if post.post.user == request.user %}
+                                                             <a class="dropdown-item p-3" href="{% url 'social_profile:edit_post_user' post.id %}">
+                                                                 <div class="d-flex align-items-top">
+                                                                   <i class="ri-pencil-line h4"></i>
+                                                                 <div class="data ms-2">
+                                                                     <button  class="delete-post" type="button">Edit Post</button>
+                                                                     <p class="mb-0">Update your post and saved items</p>
+                                                                 </div>
+                                                                 </div>
+                                                             </a>
+                                                             {% endif %}
+                                                             <a class="dropdown-item p-3" onclick="hidePost({{ post.id }})">
+                                                                 <div class="d-flex align-items-top">
+                                                                     <i class="ri-close-circle-line h4"></i>
+                                                                     <div class="data ms-2">
+                                                                         <h6>Hide From Timeline</h6>
+                                                                         <p class="mb-0">See fewer posts like this.</p>
+                                                                     </div>
+                                                                 </div>
+                                                             </a>
+                                                             {% if post.post.user == request.user or request.user == user%}
+                                                             <a onclick="return confirm('Are you sure you want to delete this post?')" href= "{% url 'social_profile:delete_post_user' post.post.id %}"class="dropdown-item p-3">
+                                                                 <div class="d-flex align-items-top">
+                                                                    <i class="ri-delete-bin-7-line h4"></i>
+                                                                 <div class="data ms-2">
+                                                                         <button class="delete-post" ><h6>Delete</h6></button>      
+                                                                     <p class="mb-0">Remove thids Post on Timeline</p>
+                                                                 </div>
+                                                                 </div>
+                                                             </a>
+                                                             {% endif %}
+                                                             {% if post.post.user == request.user %}
+                                                                 {% if post.comments_closed %}
+                                                                     <a class="dropdown-item p-3">
+                                                                         <div class="d-flex align-items-top">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-unlock"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
+
+                                                                             <div class="data ms-2">
+                                                                                 <button class="delete-post" onclick="openComment({{ post.id }})">
+                                                                                     <h6>Open comment this post</h6>
+                                                                                 </button>
+                                                                                 <p class="mb-0">Turn on comment on Post</p>
+                                                                             </div>
+                                                                         </div>
+                                                                     </a>
+                                                                 {% else %}
+                                                                     <a class="dropdown-item p-3">
+                                                                         <div class="d-flex align-items-top">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-lock"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+
+                                                                             <div class="data ms-2">
+                                                                                 <button class="delete-post" onclick="closeComment({{ post.id }})">
+                                                                                     <h6>Close comment this post</h6>
+                                                                                 </button>
+                                                                                 <p class="mb-0">Turn off comment on Post</p>
+                                                                             </div>
+                                                                         </div>
+                                                                     </a>
+                                                                 {% endif %}
+                                                             {% endif %}
+                                                                                                                         
+                                                             <a class="dropdown-item p-3" href="#">
+                                                                 <div class="d-flex align-items-top">
+                                                                    <i class="ri-notification-line h4"></i>
+                                                                 <div class="data ms-2">
+                                                                     <h6>Notifications</h6>
+                                                                     <p class="mb-0">Turn on notifications for this post</p>
+                                                                 </div>
+                                                                 </div>
+                                                             </a>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+                                 <div id="content_video">
+                                     <p id="postContent">{% autoescape off %}
+                                        {{ post.post.content }}
+                                        {% endautoescape %}</p>
+                                   </div>
+                                 
+                                 <div class="user-post">
+                                     <a href="javascript:void();" >
+                                         {% if post.post.postimageuser_set.all %}
+                                             {% with post_images=post.post.postimageuser_set.all %}
+              
+                                             {% if post_images.count == 1 %}
+                                             <a href="{% url 'social_profile:detail_image_post' post_images.0.id %}" class="detail-link">
+                                                 <img src="{{ post_images.0.image.url }}" alt="post-image" class="w-100" width="610px" height="406px" />
+                                             </a>
+                                         {% elif post_images.count == 2 %}
+                                             <div class="image-container">
+                                                 <a href="{% url 'social_profile:detail_image_post' post_images.0.id %}" class="detail-link">
+                                                     <img src="{{ post_images.0.image.url }}" alt="post-image" width="610px" height="303px" style="margin: 1px; border: 1px double gray;"/>
+                                                 </a>
+                                                 <a href="{% url 'social_profile:detail_image_post' post_images.1.id %}" class="detail-link">
+                                                     <img src="{{ post_images.1.image.url }}" alt="post-image" width="610px" height="303px" style="margin: 1px; border: 1px double gray;"/>
+                                                 </a>
+                                             </div>
+                                                 {% elif post_images.count == 3 %}
+                                                 <a href="{% url 'social_profile:detail_image_post' image_id=post_images.0.id %}">
+                                                     <img src="{{ post_images.0.image.url }}" alt="post-image" width="610px" height="403px" style="margin: 1px; border: 1px double gray;"/>
+                                                 </a>
+                 
+                                                     <div class="image-container">                         
+                                                         <div class="w-50" style="float: left;">
+                                                             <a href="{% url 'social_profile:detail_image_post' image_id=post_images.1.id %}">
+                                                                 <img src="{{ post_images.1.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                             </a>
+                                                         </div>
+                                                         <div class="w-50" style="float: left;">
+                                                             <a href="{% url 'social_profile:detail_image_post' image_id=post_images.2.id %}">
+                                                                 <img src="{{ post_images.2.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                             </a>
+                                                         </div>
+                                                         <div style="clear: both;"></div>
+                                                     </div>
+                                                 {% elif post_images.count == 4 %}
+                                                     <div class="image-container">
+                                                         <div class="image-container">
+                                                             <div class="w-50" style="float: left;">
+                                                                 <a href="{% url 'social_profile:detail_image_post' image_id=post_images.0.id %}">
+                                                                     <img src="{{ post_images.0.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                                 </a>
+                                                             </div>
+                                                             <div class="w-50" style="float: left;">
+                                                                 <a href="{% url 'social_profile:detail_image_post' image_id=post_images.1.id %}">
+                                                                     <img src="{{ post_images.1.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                                 </a>
+                                                             
+                                                             </div>
+                                                             <div style="clear: both;"></div>
+                                                         </div>
+                                                         <div class="image-container">
+                                                             <div class="w-50" style="float: left;">
+                                                                 <a href="{% url 'social_profile:detail_image_post' image_id=post_images.2.id %}">
+                                                                     <img src="{{ post_images.2.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                                 </a>
+                                                             </div>
+                                                             <div class="w-50" style="float: left;">
+                                                                 <a href="{% url 'social_profile:detail_image_post' image_id=post_images.3.id %}">
+                                                                     <img src="{{ post_images.3.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                                 </a>
+                                                             </div>
+                                                             <div style="clear: both;"></div>
+                                                         </div>
+                                                     </div>
+                                                 {% else %}
+                                                 <div class="image-container">
+                                                     <div class="image-container">
+                                                         <div class="w-50" style="float: left;">
+                                                             <a href="{% url 'social_profile:detail_image_post' image_id=post_images.0.id %}">
+                                                                 <img src="{{ post_images.0.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                             </a>
+                                                         </div>
+                                                         <div class="w-50" style="float: left;">
+                                                             <a href="{% url 'social_profile:detail_image_post' image_id=post_images.1.id %}">
+                                                                 <img src="{{ post_images.1.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                             </a>
+                                                         </div>
+                                                         <div style="clear: both;"></div>
+                                                     </div>
+                                                     <div class="image-container">
+                                                         <div class="w-50" style="float: left;">
+                                                             <a href="{% url 'social_profile:detail_image_post' image_id=post_images.2.id %}">
+                                                                 <img src="{{ post_images.2.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                             </a>
+                                                         </div>
+                                                         <div class="w-50" style="float: left; position: relative;">
+                                                             <a href="{% url 'social_profile:detail_image_post' image_id=post_images.3.id %}">
+                                                                 <img src="{{ post_images.3.image.url }}" alt="post-image" width="305px" height="406px" style="filter: blur(5px); margin: 1px;" />
+                                                             </a>
+                                                             <div class="overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 10px; font-size: 70px; color: black">
+                                                                 +{{ post_images.count|add:"-4" }}
+                                                             </div>
+                                                         </div>
+                                                         <div style="clear: both;"></div>
+                                                     </div>
+                                                 </div>
+                                                 {% endif %}
+                                             
+                                             {% endwith %}
+                                         {% endif %}
+                                         {% for video in post.post.videos_user.all %}
+                                                 <video controls width="610px" height="406px">
+                                                     <source src="{{ video.video.url }}" type="video/mp4">
+                                                     Your browser does not support the video tag.
+                                                 </video>
+                                         {% endfor %}
+                                     
+                                     </a>
+                                 </div>
+                                 
+                                 <div class="comment-area mt-3">
+                                     {% comment %} justify-content-between {% endcomment %}
+                                     <div class="d-flex  align-items-center flex-wrap"> 
+                                         <div class="like-block position-relative d-flex align-items-center">
+                                             <div class="d-flex align-items-center">
+                                                 <div class="total-like-block ms-2 me-3" style="float: left;">
+                                                 <div class="dropdown">
+                                                     <form method="POST" class="like-form " >
+                                                         {% csrf_token %}
+                                                         <input type="hidden" name="post_id" value="{{ post.post.id }}">
+                                                         <button type="submit" class="like-button "></button>
+                                                         <span class="like-count">{{ post.post.likes_user.count }}</span>
+                                                     </form>
+                                                     <span class="dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                                                     </span> 
+                                                     <div class="dropdown-menu">
+                                                         {% for like in post.likes_user.all %}
+                                                         <a class="dropdown-item" href="#">{{ post.like.user.last_name }}</a>
+                                                         {% endfor %}
+                                                     </div>
+                                                     
+                                                 </div>
+                                                 </div>
+                                             </div>
+                                             <div class="total-comment-block">
+                                                 <div class="dropdown">
+                                                 <span class="dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                                                     <!-- {{  total_comments }} Comments -->
+                                                     {{post.post.comments_user.count}} comment
+                                                 </span>
+                                                 <div class="dropdown-menu">
+                                                     {% for comment in post.post.comments_user.all %}
+                                                         <a class="dropdown-item" href="#">{{ comment.user.last_name }}</a>
+                                                     {% endfor %}
+                                                     
+                                                 </div>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                         
+                                     </div>
+                                     <hr>
+                                     <ul class="post-comments p-0 m-0 comments" >
+                                         {% for comment in post.post.comments_user.all %}
+                                         {% if comment.post == post.post %}
+                                         <li id="comments-{{ post.post.id }}" >
+                                             <div class="d-flex" style="margin-top:15px">
+                                                 <div class="user-img">
+                                                   
+                                                 <img src="{{ comment.user.profile.avatar.url }}" alt="userimg" class="avatar-35 rounded-circle img-fluid">
+                                                 </div>
+                                                 <div class="comment-data-block ms-3">
+                                                     <div class="d-flex" >
+                                                         <div class="comment-main" id="comment-main">
+                                                            {% if comment.user.id == request.user.id %}
+                                                             <h6><a style="color: #0c0c0c;" href="{% url 'social_profile:profile' %}">
+                                                                {{ comment.user.last_name }}
+                                                             </a>
+                                                            </h6>
+                                                            {%else%}
+                                                            <h6><a style="color: #0c0c0c;" href="{% url 'social_profile:view_profile_user' comment.user.id  %}">
+                                                                {{ comment.user.last_name }}
+                                                             </a>
+                                                            </h6>
+                                                            {%endif%}
+                                                             <p id="comment_content_{{ comment.id }}">{{ comment.content }}</p> 
+                                                         </div>
+                                                         {% if user.is_authenticated and user == comment.user or request.user == comment.post.user%}                                                        <div class="dropdown">
+                                                             <div   id="post-option"  data-bs-toggle="dropdown">
+                                                                 <i class="ri-more-fill h4"></i>
+                                                             </div>
+                                                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="post-option" >
+                                                                 <a class="dropdown-item" onclick="deleteComment({{ comment.id }})">Delete</a>
+                                                                 <a class="dropdown-item dropdown-item-edit-{{ comment.id }}"  onclick="editComment({{ comment.id }})">Edit</a>
+                                                             </div>
+                                                         </div>
+                                                         {% endif %}
+                                                     </div>  
+                                                     <div class="comment-media">
+                                                         
+                                                         {% for image in comment.images_user.all %}
+                                                         <a href="{% url 'social_profile:detail_image_comment' image_id=image.id %}">
+                                                             <img src="{{ image.image.url }}" width="200" height="100" alt="Comment Image">
+                                                         </a>
+                                                         {% endfor %}
+                                                     </div>
+                                                     <div class="comment-media">
+                                                         {% for video in comment.videos_user.all %}
+                                                             <div class="video-container">
+                                                                 <video controls width="412px" height="254px">
+                                                                     <source src="{{ video.video.url }}" type="video/mp4">
+                                                                 </video>
+                                                             </div>
+                                                         {% endfor %}
+                                                     </div>              
+                                                 <div class="d-flex flex-wrap align-items-center comment-activity">
+                                                     {% if not post.comments_closed%}
+                                                     <button class="like-button-comment " style="background: none; border: none; display: flex; align-items: center;" data-like-comment-id="{{ comment.id }}">
+                                                         <span style="color: #60b8ff; margin-top: 0; margin-right: 5px;">Like</span>
+                                                         <a href="javascript:void();" class="like-count-comment">{{ comment.likes.count }}</a>
+                                                     </button>
+                                                     <a class="btn btn-primary btn-sm reply-button d-inline-block" style="background: none; border: none; "  data-comment-id="{{ comment.id }}">Reply</a>
+                                                     <a href="javascript:void();">{{ comment.created_at|custom_timesince }}</a>
+                                                    {% else %} 
+                                                    {% comment %} <button class="like-button-comment " style="background: none; border: none; display: flex; align-items: center;" data-like-comment-id="{{ comment.id }}"> {% endcomment %}
+                                                     <span style="color: #60b8ff; margin-top: 0; margin-right: 5px;">Like</span>
+                                                     <a href="javascript:void();" class="like-count-comment">{{ comment.likes.count }}</a>
+                                                     </button>
+                                                     <a class="btn btn-primary btn-sm reply-button d-inline-block" style="background: none; border: none; " >Reply</a>
+                                                     <a href="javascript:void();">{{ comment.created_at|custom_timesince }}</a>
+                                                    {% endif %}
+                                                 </div>
+                                                 <div class="reply-container" id="reply-form-{{ comment.id }}" data-comment-id="{{ comment.id }}" style="display: none;">
+                                                     <form  class="reply-form" data-comment-id="{{ comment.id }}" id="reply-form-{{ comment.id }}">
+                                                         {% csrf_token %}
+                                                         <input type="text" class="form-control" name="reply_content" placeholder="Viết phản hồi của bạn..." required>
+                                                         <button type="button" class="btn btn-primary btn-sm reply-button" onclick="addReply({{ comment.id }})">Gửi</button>
+                                                     </form>
+                                                 </div>
+                                                 <div class="d-flex flex-wrap align-items-center comment-activity">
+                                                     <div class="replies ">
+                                                         {% for reply in comment.replies_user.all %}
+                                                             <div class="reply d-flex flex-wrap " >
+                                                                 <img src="{{ reply.user.profile.avatar.url }}" style="margin-top: 0px; margin-right: 15px" alt="userimg" class="avatar-35 rounded-circle img-fluid">
+                                                                 <div class="reply-content">
+                                                                    {% if reply.user.id == request.user.id %}
+                                                                     <span style="color: black" style="margin-top:15px">
+                                                                        <a style="color: #0c0c0c;" href="{% url 'social_profile:profile' %}" >
+                                                                            <strong>{{ reply.user.last_name }}</strong>
+                                                                        </a>      
+                                                                    </span>
+                                                                    {%else%}
+                                                                    <span style="color: black" style="margin-top:15px">
+                                                                        <a style="color: #0c0c0c;" href="{% url 'social_profile:view_profile_user' post.friend_user.id %}" >
+                                                                            <strong>{{ reply.user.last_name }}</strong>
+                                                                        </a>      
+                                                                    </span>
+                                                                    {%endif%}
+                                                                     <p class="reply-text" id="reply_content_{{ reply.id }}">{{ reply.text }}</p> 
+                                                                 </div>    
+                                                                 {% if user.is_authenticated and user == reply.user %}
+                                                                 <div class="dropdown">
+                                                                     <div   id="post-option"  data-bs-toggle="dropdown">
+                                                                         <i class="ri-more-fill h4"></i>
+                                                                     </div>
+                                                                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="post-option" >
+                                                                         <a class="dropdown-item" onclick="deleteReply({{ reply.id }})">Delete</a>
+                                                                         <a class="dropdown-item dropdown-item-edit-{{ reply.id }}"  onclick="editReply({{ reply.id }})">Edit</a>
+                                                                     </div>
+                                                                 </div>
+                                                                 {% endif %}
+                                                             </div>
+                                                             <div class="d-flex flex-wrap" style="margin-left: 45px">
+                                                                 <button class="like-button-reply" data-reply-id="{{ reply.id }}" style="background: none; border: none; ">
+                                                                    <p style="color: #60b8ff; margin-top: -1px" > Like</p>
+                                                                 </button>
+                                                                 <a href="javascript:void();" class="like-count">{{ reply.likes_user.count }}</a>
+                                                                 <a style="padding-left: 15px;" href="javascript:void();">{{ reply.created_at | custom_timesince }}</a>
+                                                             </div>
+                                                         {% endfor %}
+                                                     </div>
+                                                     <span> {{ commnet.created_at }} </span>
+                                                 </div>
+                                                
+                                             </div>
+                                         </li>
+                                        
+                                         {% endif %}
+                                         {% endfor %}
+                                     </ul>
+                                     {% if not post.post.comments_closed %}
+                                     <form data-post-id="{{ post.post.id }}"  class="comment-text d-flex align-items-center mt-3 comment-form">
+                                         {% csrf_token %}
+                                               <input type="text" id="comment-content" name="content" class="form-control rounded" placeholder="Enter Your Comment" >                                           
+                                         <div class="comment-attagement d-flex">
+                                             <label for="file-input-comment-{{ post.post.id }}">
+                                                 <a id="fileUploadButtonComment-{{ post.post.id }}"><i class="ri-camera-line me-3"></i></a>
+                                             </label>
+                                             <input type="file" name="image_comment" id="file-input-comment-{{ post.post.id }}" class="file-input-comment" data-post-id="{{ post.post.id }}" style="display: none;" multiple>
+ 
+                                             <label for="video-input-comment-{{ post.post.id }}" class="video-label">
+                                                 <a id="videoUploadButtonComment-{{ post.post.id }}"><i class="ri-link me-3"></i></a>
+                                             </label>
+                                             <input type="file" name="video_comment" id="video-input-comment-{{ post.post.id }}" class="video-input-comment video-input" data-post-id="{{ post.post.id }}" style="display: none;" multiple accept="video/*">
+                                             <button id="comment-submit" type="submit" class="btn btn-primary">Send</button>
+                                         </div>
+                                     </form>
+                                     {% else %}
+                                     <p style="margin-top: 30px; color:black; background-color: #ccc;padding: 12px 180px;; border-radius: 5px;">Comment is closed for this post</p>
+ 
+                                     {% endif %}
+                                     <div class="other-option">
+                                         <div class="d-flex align-items-center justify-content-between">
+                                             <div class="d-flex align-items-center">
+                                                 <div class="user-img me-3"> 
+                                                     <div id="preview-file-comment-{{ post.post.id }}" class="image-size preview-file-comment"></div>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+                             </div> 
+                             <hr style="border: 1px solid #ccc;">
+                             {%else %}
+                              <div class="post-item" id="post-{{ post.id }}">
+                                 <div class="user-post-data py-3">
+                                     <div class="d-flex justify-content-between">
+                                         <div class=" me-3">
+                                             <img class="rounded-circle " width="52px" height="52px" src="{{ post.user.profile.avatar.url }}" alt="">
+                                         </div>
+                                         <div class="w-100">
+                                             <div class="d-flex justify-content-between">
+                                                 <div class="">
+                                                     <h5 class="mb-0 d-inline-block">
+                                                         <a href="">{{ post.user.last_name }}</a>
+                                                     </h5>
+                                                     <div style="display: flex; align-items: center;">
+                                                        {% if post.privacy == 'public' %}
+                                                            <i class="fas fa-globe" title="Public"></i>
+                                                        {% elif post.privacy == 'private' %}
+                                                            <i class="fas fa-lock" title="Private"></i>
+                                                        {% elif post.privacy == 'friend' %}
+                                                            <i class="fas fa-user-friends" title="Friend"></i>
+                                                        {% endif %}
+                                                         <p style="margin-left: 3.5px" class="mb-0" > {{ post.created_at|custom_timesince }}</p>
+                                                     </div>
+                                                 </div>
+ 
+                                                 <div class="card-post-toolbar">
+                                                     <div class="dropdown">
+                                                         <span class="dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                                                         <i class="ri-more-fill"></i>
+                                                         </span>
+                                                         <div class="dropdown-menu m-0 p-0">
+                                                            <a class="dropdown-item p-3" href="{% url 'social_profile:save_post_user' post.id %}">
+                                                                 <div class="d-flex align-items-top">
+                                                                 <i class="ri-save-line h4"></i>
+                                                                 <div class="data ms-2">
+                                                                     <button  class="delete-post" type="button">Save Post</button>
+                                                                     <p class="mb-0">Add this to your saved items</p>
+                                                                 </div>
+                                                                 </div>
+                                                             </a>
+                                                             {% if post.user == request.user %}
+                                                             <a class="dropdown-item p-3" href="{% url 'social_profile:edit_post_user' post.id %}">
+                                                                 <div class="d-flex align-items-top">
+                                                                   <i class="ri-pencil-line h4"></i>
+                                                                 <div class="data ms-2">
+                                                                     <button  class="delete-post" type="button">Edit Post</button>
+                                                                     <p class="mb-0">Update your post and saved items</p>
+                                                                 </div>
+                                                                 </div>
+                                                             </a>
+                                                             {% endif %}
+                                                             <a class="dropdown-item p-3" onclick="hidePost({{ post.id }})">
+                                                                 <div class="d-flex align-items-top">
+                                                                     <i class="ri-close-circle-line h4"></i>
+                                                                     <div class="data ms-2">
+                                                                         <h6>Hide From Timeline</h6>
+                                                                         <p class="mb-0">See fewer posts like this.</p>
+                                                                     </div>
+                                                                 </div>
+                                                             </a>
+                                                             {% if post.user == request.user %}
+                                                             <a onclick="return confirm('Are you sure you want to delete this post?')" href= "{% url 'social_profile:delete_post_user' post.id %}"class="dropdown-item p-3">
+                                                                 <div class="d-flex align-items-top">
+                                                                    <i class="ri-delete-bin-7-line h4"></i>
+                                                                 <div class="data ms-2">
+                                                                         <button class="delete-post" ><h6>Delete</h6></button>      
+                                                                     <p class="mb-0">Remove thids Post on Timeline</p>
+                                                                 </div>
+                                                                 </div>
+                                                             </a>
+                                                             {% endif %}
+                                                             {% if post.user == request.user %}
+                                                                 {% if post.comments_closed %}
+                                                                     <a class="dropdown-item p-3">
+                                                                         <div class="d-flex align-items-top">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-unlock"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
+
+                                                                             <div class="data ms-2">
+                                                                                 <button class="delete-post" onclick="openComment({{ post.id }})">
+                                                                                     <h6>Open comment this post</h6>
+                                                                                 </button>
+                                                                                 <p class="mb-0">Turn on comment on Post</p>
+                                                                             </div>
+                                                                         </div>
+                                                                     </a>
+                                                                 {% else %}
+                                                                     <a class="dropdown-item p-3">
+                                                                         <div class="d-flex align-items-top">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-lock"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+
+                                                                             <div class="data ms-2">
+                                                                                 <button class="delete-post" onclick="closeComment({{ post.id }})">
+                                                                                     <h6>Close comment this post</h6>
+                                                                                 </button>
+                                                                                 <p class="mb-0">Turn off comment on Post</p>
+                                                                             </div>
+                                                                         </div>
+                                                                     </a>
+                                                                 {% endif %}
+                                                             {% endif %}
+                                                                                                                         
+                                                             <a class="dropdown-item p-3" href="#">
+                                                                 <div class="d-flex align-items-top">
+                                                                    <i class="ri-notification-line h4"></i>
+                                                                 <div class="data ms-2">
+                                                                     <h6>Notifications</h6>
+                                                                     <p class="mb-0">Turn on notifications for this post</p>
+                                                                 </div>
+                                                                 </div>
+                                                             </a>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+                                 <div id="content_video">
+                                     <p id="postContent">{% autoescape off %}{{ post.content }}{% endautoescape %}</p>
+                                   </div>
+                                 
+                                 <div class="user-post">
+                                     <a href="javascript:void();" >
+                                         {% if post.postimageuser_set.all %}
+                                             {% with post_images=post.postimageuser_set.all %}
+              
+                                             {% if post_images.count == 1 %}
+                                             <a href="{% url 'social_profile:detail_image_post' post_images.0.id %}" class="detail-link">
+                                                 <img src="{{ post_images.0.image.url }}" alt="post-image" class="w-100" width="610px" height="406px" />
+                                             </a>
+                                         {% elif post_images.count == 2 %}
+                                             <div class="image-container">
+                                                 <a href="{% url 'social_profile:detail_image_post' post_images.0.id %}" class="detail-link">
+                                                     <img src="{{ post_images.0.image.url }}" alt="post-image" width="610px" height="303px" style="margin: 1px; border: 1px double gray;"/>
+                                                 </a>
+                                                 <a href="{% url 'social_profile:detail_image_post' post_images.1.id %}" class="detail-link">
+                                                     <img src="{{ post_images.1.image.url }}" alt="post-image" width="610px" height="303px" style="margin: 1px; border: 1px double gray;"/>
+                                                 </a>
+                                             </div>
+                                                 {% elif post_images.count == 3 %}
+                                                 <a href="{% url 'social_profile:detail_image_post' image_id=post_images.0.id %}">
+                                                     <img src="{{ post_images.0.image.url }}" alt="post-image" width="610px" height="403px" style="margin: 1px; border: 1px double gray;"/>
+                                                 </a>
+                 
+                                                     <div class="image-container">                         
+                                                         <div class="w-50" style="float: left;">
+                                                             <a href="{% url 'social_profile:detail_image_post' image_id=post_images.1.id %}">
+                                                                 <img src="{{ post_images.1.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                             </a>
+                                                         </div>
+                                                         <div class="w-50" style="float: left;">
+                                                             <a href="{% url 'social_profile:detail_image_post' image_id=post_images.2.id %}">
+                                                                 <img src="{{ post_images.2.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                             </a>
+                                                         </div>
+                                                         <div style="clear: both;"></div>
+                                                     </div>
+                                                 {% elif post_images.count == 4 %}
+                                                     <div class="image-container">
+                                                         <div class="image-container">
+                                                             <div class="w-50" style="float: left;">
+                                                                 <a href="{% url 'social_profile:detail_image_post' image_id=post_images.0.id %}">
+                                                                     <img src="{{ post_images.0.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                                 </a>
+                                                             </div>
+                                                             <div class="w-50" style="float: left;">
+                                                                 <a href="{% url 'social_profile:detail_image_post' image_id=post_images.1.id %}">
+                                                                     <img src="{{ post_images.1.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                                 </a>
+                                                             
+                                                             </div>
+                                                             <div style="clear: both;"></div>
+                                                         </div>
+                                                         <div class="image-container">
+                                                             <div class="w-50" style="float: left;">
+                                                                 <a href="{% url 'social_profile:detail_image_post' image_id=post_images.2.id %}">
+                                                                     <img src="{{ post_images.2.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                                 </a>
+                                                             </div>
+                                                             <div class="w-50" style="float: left;">
+                                                                 <a href="{% url 'social_profile:detail_image_post' image_id=post_images.3.id %}">
+                                                                     <img src="{{ post_images.3.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                                 </a>
+                                                             </div>
+                                                             <div style="clear: both;"></div>
+                                                         </div>
+                                                     </div>
+                                                 {% else %}
+                                                 <div class="image-container">
+                                                     <div class="image-container">
+                                                         <div class="w-50" style="float: left;">
+                                                             <a href="{% url 'social_profile:detail_image_post' image_id=post_images.0.id %}">
+                                                                 <img src="{{ post_images.0.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                             </a>
+                                                         </div>
+                                                         <div class="w-50" style="float: left;">
+                                                             <a href="{% url 'social_profile:detail_image_post' image_id=post_images.1.id %}">
+                                                                 <img src="{{ post_images.1.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                             </a>
+                                                         </div>
+                                                         <div style="clear: both;"></div>
+                                                     </div>
+                                                     <div class="image-container">
+                                                         <div class="w-50" style="float: left;">
+                                                             <a href="{% url 'social_profile:detail_image_post' image_id=post_images.2.id %}">
+                                                                 <img src="{{ post_images.2.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                             </a>
+                                                         </div>
+                                                         <div class="w-50" style="float: left; position: relative;">
+                                                             <a href="{% url 'social_profile:detail_image_post' image_id=post_images.3.id %}">
+                                                                 <img src="{{ post_images.3.image.url }}" alt="post-image" width="305px" height="406px" style="filter: blur(5px); margin: 1px;" />
+                                                             </a>
+                                                             <div class="overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 10px; font-size: 70px; color: black">
+                                                                 +{{ post_images.count|add:"-4" }}
+                                                             </div>
+                                                         </div>
+                                                         <div style="clear: both;"></div>
+                                                     </div>
+                                                 </div>
+                                                 {% endif %}
+                                             
+                                             {% endwith %}
+                                         {% endif %}
+                                         {% for video in post.videos_user.all %}
+                                                 <video controls width="610px" height="406px">
+                                                     <source src="{{ video.video.url }}" type="video/mp4">
+                                                     Your browser does not support the video tag.
+                                                 </video>
+                                         {% endfor %}
+                                     
+                                     </a>
+                                 </div>
+                                 
+                                 <div class="comment-area mt-3">
+                                     {% comment %} justify-content-between {% endcomment %}
+                                     <div class="d-flex  align-items-center flex-wrap"> 
+                                         <div class="like-block position-relative d-flex align-items-center">
+                                             <div class="d-flex align-items-center">
+                                                 <div class="total-like-block ms-2 me-3" style="float: left;">
+                                                 <div class="dropdown">
+                                                     <form method="POST" class="like-form " >
+                                                         {% csrf_token %}
+                                                         <input type="hidden" name="post_id" value="{{ post.id }}">
+                                                         <button type="submit" class="like-button "></button>
+                                                         <span class="like-count">{{ post.likes_user.count }}</span>
+                                                     </form>
+                                                     <span class="dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                                                     </span> 
+                                                     <div class="dropdown-menu">
+                                                         {% for like in post.likes_user.all %}
+                                                         <a class="dropdown-item" href="#">{{ like.user.last_name }}</a>
+                                                         {% endfor %}
+                                                     </div>
+                                                     
+                                                 </div>
+                                                 </div>
+                                             </div>
+                                             <div class="total-comment-block">
+                                                 <div class="dropdown">
+                                                 <span class="dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                                                     <!-- {{  total_comments }} Comments -->
+                                                     {{post.comments_user.count}} comment
+                                                 </span>
+                                                 <div class="dropdown-menu">
+                                                     {% for comment in post.comments_user.all %}
+                                                         <a class="dropdown-item" href="#">{{ comment.user.last_name }}</a>
+                                                     {% endfor %}
+                                                     
+                                                 </div>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                         
+                                     </div>
+                                     <hr>
+                                     <ul class="post-comments p-0 m-0 comments" >
+                                         {% for comment in comments %}
+                                         {% if comment.post == post %}
+                                         <li id="comments-{{ post.id }}" >
+                                             <div class="d-flex" style="margin-top:15px">
+                                                 <div class="user-img">
+                                                 <img src="{{ comment.user.profile.avatar.url }}" alt="userimg" class="avatar-35 rounded-circle img-fluid">
+                                                 </div>
+                                                 <div class="comment-data-block ms-3">
+                                                     <div class="d-flex" >
+                                                         <div class="comment-main" id="comment-main">
+                                                            {% if comment.user.id == request.user.id %}
+                                                            <a href="{% url 'social_profile:profile'  %}">
+                                                             <h6>{{ comment.user.last_name }}</h6>
+                                                            </a>
+                                                            {%else%}
+                                                            <a href="{% url 'social_profile:view_profile_user' comment.user.id %}">
+                                                                <h6>{{ comment.user.last_name }}</h6>
+                                                               </a>
+                                                            {%endif%}
+                                                             <p id="comment_content_{{ comment.id }}">{{ comment.content }}</p> 
+                                                         </div>
+                                                         {% if user.is_authenticated and user == comment.user or request.user == comment.post.user%}                                                        <div class="dropdown">
+                                                             <div   id="post-option"  data-bs-toggle="dropdown">
+                                                                 <i class="ri-more-fill h4"></i>
+                                                             </div>
+                                                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="post-option" >
+                                                                 <a class="dropdown-item" onclick="deleteComment({{ comment.id }})">Delete</a>
+                                                                 <a class="dropdown-item dropdown-item-edit-{{ comment.id }}"  onclick="editComment({{ comment.id }})">Edit</a>
+                                                             </div>
+                                                         </div>
+                                                         {% endif %}
+                                                     </div>  
+                                                     <div class="comment-media">
+                                                         
+                                                         {% for image in comment.images_user.all %}
+                                                         <a href="{% url 'social_profile:detail_image_comment' image_id=image.id %}">
+                                                             <img src="{{ image.image.url }}" width="200" height="100" alt="Comment Image">
+                                                         </a>
+                                                         {% endfor %}
+                                                     </div>
+                                                     <div class="comment-media">
+                                                         {% for video in comment.videos_user.all %}
+                                                             <div class="video-container">
+                                                                 <video controls width="412px" height="254px">
+                                                                     <source src="{{ video.video.url }}" type="video/mp4">
+                                                                 </video>
+                                                             </div>
+                                                         {% endfor %}
+                                                     </div>              
+                                                 <div class="d-flex flex-wrap align-items-center comment-activity">
+                                                     {% if not post.comments_closed%}
+                                                     <button class="like-button-comment " style="background: none; border: none; display: flex; align-items: center;" data-like-comment-id="{{ comment.id }}">
+                                                         <span style="color: #60b8ff; margin-top: 0; margin-right: 5px;">Like</span>
+                                                         <a href="javascript:void();" class="like-count-comment">{{ comment.likes.count }}</a>
+                                                     </button>
+                                                     <a class="btn btn-primary btn-sm reply-button d-inline-block" style="background: none; border: none; "  data-comment-id="{{ comment.id }}">Reply</a>
+                                                     <a href="javascript:void();">{{ comment.created_at|custom_timesince }}</a>
+                                                    {% else %} 
+                                                    {% comment %} <button class="like-button-comment " style="background: none; border: none; display: flex; align-items: center;" data-like-comment-id="{{ comment.id }}"> {% endcomment %}
+                                                     <span style="color: #60b8ff; margin-top: 0; margin-right: 5px;">Like</span>
+                                                     <a href="javascript:void();" class="like-count-comment">{{ comment.likes.count }}</a>
+                                                     </button>
+                                                     <a class="btn btn-primary btn-sm reply-button d-inline-block" style="background: none; border: none; " >Reply</a>
+                                                     <a href="javascript:void();">{{ comment.created_at|custom_timesince }}</a>
+                                                    {% endif %}
+                                                 </div>
+                                                 <div class="reply-container" id="reply-form-{{ comment.id }}" data-comment-id="{{ comment.id }}" style="display: none;">
+                                                     <form  class="reply-form" data-comment-id="{{ comment.id }}" id="reply-form-{{ comment.id }}">
+                                                         {% csrf_token %}
+                                                         <input type="text" class="form-control" name="reply_content" placeholder="Viết phản hồi của bạn..." required>
+                                                         <button type="button" class="btn btn-primary btn-sm reply-button" onclick="addReply({{ comment.id }})">Gửi</button>
+                                                     </form>
+                                                 </div>
+                                                 <div class="d-flex flex-wrap align-items-center comment-activity">
+                                                     <div class="replies ">
+                                                         {% for reply in comment.replies_user.all %}
+                                                             <div class="reply d-flex flex-wrap " >
+                                                                 <img src="{{ reply.user.profile.avatar.url }}" style="margin-top: 0px; margin-right: 15px" alt="userimg" class="avatar-35 rounded-circle img-fluid">
+                                                                 <div class="reply-content">
+                                                                    {% if reply.user.id == request.user.id%}
+                                                                    <a style="color: black" href="{% url 'social_profile:profile' %}">
+                                                                     <span style="margin-top:15px"><strong>{{ reply.user.last_name }}</strong></span>
+                                                                    </a>
+                                                                    {% else %}
+                                                                    <a style="color: black" href="{% url 'social_profile:view_profile_user' reply.user.id %}">
+                                                                        <span style="margin-top:15px"><strong>{{ reply.user.last_name }}</strong></span>
+                                                                       </a>
+                                                                    {%endif%}
+                                                                     <p class="reply-text" id="reply_content_{{ reply.id }}">{{ reply.text }}</p> 
+                                                                 </div>    
+                                                                 {% if user.is_authenticated and user == reply.user %}
+                                                                 <div class="dropdown">
+                                                                     <div   id="post-option"  data-bs-toggle="dropdown">
+                                                                         <i class="ri-more-fill h4"></i>
+                                                                     </div>
+                                                                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="post-option" >
+                                                                         <a class="dropdown-item" onclick="deleteReply({{ reply.id }})">Delete</a>
+                                                                         <a class="dropdown-item dropdown-item-edit-{{ reply.id }}"  onclick="editReply({{ reply.id }})">Edit</a>
+                                                                     </div>
+                                                                 </div>
+                                                                 {% endif %}
+                                                             </div>
+                                                             <div class="d-flex flex-wrap" style="margin-left: 45px">
+                                                                 <button class="like-button-reply" data-reply-id="{{ reply.id }}" style="background: none; border: none; ">
+                                                                    <p style="color: #60b8ff; margin-top: -1px" > Like</p>
+                                                                 </button>
+                                                                 <a href="javascript:void();" class="like-count">{{ reply.likes_user.count }}</a>
+                                                                 <a style="padding-left: 15px;" href="javascript:void();">{{ reply.created_at | custom_timesince }}</a>
+                                                             </div>
+                                                         {% endfor %}
+                                                     </div>
+                                                     <span> {{ commnet.created_at }} </span>
+                                                 </div>
+                                                
+                                             </div>
+                                         </li>
+                                        
+                                         {% endif %}
+                                         {% endfor %}
+                                     </ul>
+                                     {% if not post.comments_closed %}
+                                     <form data-post-id="{{ post.id }}"  class="comment-text d-flex align-items-center mt-3 comment-form">
+                                         {% csrf_token %}
+                                               <input type="text" id="comment-content" name="content" class="form-control rounded" placeholder="Enter Your Comment" >                                           
+                                         <div class="comment-attagement d-flex">
+                                             <label for="file-input-comment-{{ post.id }}">
+                                                 <a id="fileUploadButtonComment-{{ post.id }}"><i class="ri-camera-line me-3"></i></a>
+                                             </label>
+                                             <input type="file" name="image_comment" id="file-input-comment-{{ post.id }}" class="file-input-comment" data-post-id="{{ post.id }}" style="display: none;" multiple>
+ 
+                                             <label for="video-input-comment-{{ post.id }}" class="video-label">
+                                                 <a id="videoUploadButtonComment-{{ post.id }}"><i class="ri-link me-3"></i></a>
+                                             </label>
+                                             <input type="file" name="video_comment" id="video-input-comment-{{ post.id }}" class="video-input-comment video-input" data-post-id="{{ post.id }}" style="display: none;" multiple accept="video/*">
+                                             <button id="comment-submit" type="submit" class="btn btn-primary">Send</button>
+                                         </div>
+                                     </form>
+                                     {% else %}
+                                     <p style="margin-top: 30px; color:black; background-color: #ccc;padding: 12px 180px;; border-radius: 5px;">Comment is closed for this post</p>
+ 
+                                     {% endif %}
+                                     <div class="other-option">
+                                         <div class="d-flex align-items-center justify-content-between">
+                                             <div class="d-flex align-items-center">
+                                                 <div class="user-img me-3"> 
+                                                     <div id="preview-file-comment-{{ post.id }}" class="image-size preview-file-comment"></div>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+                             </div> 
+                             <hr style="border: 1px solid #ccc;">
+                             {%endif%}
+                              {% endfor%}
+                              
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="tab-pane fade" id="about" role="tabpanel" >
+               <div class="card">
+                  <div class="card-body">
+                     <div class="row">
+                        <div class="col-md-3">
+                           <ul class="nav nav-pills basic-info-items list-inline d-block p-0 m-0">
+                              <li>
+                                 <a class="nav-link active" href="#v-pills-basicinfo-tab" data-bs-toggle="pill" data-bs-target="#v-pills-basicinfo-tab" role="button">Contact and Basic Info</a>
+                              </li>
+                              <li>
+                                 <a class="nav-link" href="#v-pills-work-tab" data-bs-toggle="pill" data-bs-target="#v-pills-work-tab" role="button">Work and Education</a>
+                              </li>
+                              <li>
+                                 <a class="nav-link" href="#v-pills-lived-tab" data-bs-toggle="pill" data-bs-target="#v-pills-lived-tab" role="button">Places You've Lived</a>
+                              </li>
+                              <li>
+                                 <a class="nav-link" href="#v-pills-details-tab" data-bs-toggle="pill" data-bs-target="#v-pills-details-tab" role="button">Details About You</a>
+                              </li>
+                           </ul>
+                        </div>
+                        <div class="col-md-9 ps-4">
+                           <div class="tab-content" >
+                              <div class="tab-pane fade active show" id="v-pills-basicinfo-tab" role="tabpanel"  aria-labelledby="v-pills-basicinfo-tab">   
+                                <div class="edit-relation">
+                                    <h4 style="display: inline-block; margin-right: 5px;">Contact Information</h4>
+                                    <a href="{% url 'social_profile:edit_profile_user' user_id=request.user.id %}" style="display: inline-block; margin-left: 422px;">
+                                        <i class="ri-edit-line me-2"></i>Edit
+                                    </a>
+                                </div>
+                                 <hr>
+                                 <div class="row">
+                                    <div class="col-3">
+                                       <h6>Email</h6>
+                                    </div>
+                                    <div class="col-9">
+                                       <p class="mb-0">{{ user.username }}</p>
+                                    </div>
+                                    <div class="col-3">
+                                       <h6>Mobile</h6>
+                                    </div>
+                                    <div class="col-9">
+                                       <p class="mb-0">{{ user.profile.mobile }}</p>
+                                    </div>
+                                    <div class="col-3">
+                                       <h6>Address</h6>
+                                    </div>
+                                    <div class="col-9">
+                                       <p class="mb-0">{{ user.profile.address }}</p>
+                                    </div>
+                                 </div>
+                                 <h4 class="mt-3">Social Links</h4>
+                                 <hr>
+                                 <div class="row">
+                                    <div class="col-3">
+                                       <h6>Social Link</h6>
+                                    </div>
+                                    <div class="col-9">
+                                       <p class="mb-0">{{ user.profile.social_link }}</p>
+                                    </div>
+                                 </div>
+                                 <h4 class="mt-3">Basic Information</h4>
+                                 <hr>
+                                 <div class="row">
+                                    <div class="col-3">
+                                       <h6>Birth Date</h6>
+                                    </div>
+                                    <div class="col-9">
+                                       <p class="mb-0">{{ user.profile.birthdate.day }}</p>
+                                    </div>
+                                    <div class="col-3">
+                                       <h6>Birth Year</h6>
+                                    </div>
+                                    <div class="col-9">
+                                       <p class="mb-0">{{ user.profile.birthdate.year }}</p>
+                                    </div>
+                                    <div class="col-3">
+                                       <h6>Gender</h6>
+                                    </div>
+                                    <div class="col-9">
+                                       <p class="mb-0">{{ user.profile.gender }}</p>
+                                    </div>
+                                    <div class="col-3">
+                                       <h6>interested in</h6>
+                                    </div>
+                                    <div class="col-9">
+                                       <p class="mb-0">{{ user.profile.interested }}</p>
+                                    </div>
+                                    <div class="col-3">
+                                       <h6>language</h6>
+                                    </div>
+                                    <div class="col-9">
+                                       <p class="mb-0">{{ user.profile.language }}</p>
+                                    </div>
+                                 </div>
+                              </div>
+                              <div class="tab-pane fade" id="v-pills-family" role="tabpanel">
+                                 <h4 class="mb-3">Relationship</h4>
+                                 <ul class="suggestions-lists m-0 p-0">
+                                    <li class="d-flex mb-4 align-items-center">
+                                       <div class="user-img img-fluid"><i class="ri-add-fill"></i></div>
+                                       <div class="media-support-info ms-3">
+                                          <h6>Add Your Relationship Status</h6>
+                                       </div>
+                                    </li>
+                                 </ul>
+                                 <h4 class="mt-3 mb-3">Family Members</h4>
+                                 <ul class="suggestions-lists m-0 p-0">
+                                    <li class="d-flex mb-4 align-items-center">
+                                       <div class="user-img img-fluid"><i class="ri-add-fill"></i></div>
+                                       <div class="media-support-info ms-3">
+                                          <h6>Add Family Members</h6>
+                                       </div>
+                                    </li>
+                                    <li class="d-flex mb-4 align-items-center justify-content-between">
+                                       <div class="user-img img-fluid"><img src="../assets/images/user/01.jpg" alt="story-img" class="rounded-circle avatar-40"></div>
+                                       <div class="w-100">
+                                          <div class="d-flex justify-content-between">
+                                             <div class="ms-3">
+                                                <h6>Paul Molive</h6>
+                                                <p class="mb-0">Brothe</p>
+                                             </div>
+                                             <div class="edit-relation"><a href="#"><i class="ri-edit-line me-2"></i>Edit</a></div>
+                                          </div>
+                                       </div>
+                                    </li>
+                                    <li class="d-flex justify-content-between mb-4  align-items-center">
+                                       <div class="user-img img-fluid"><img src="../assets/images/user/02.jpg" alt="story-img" class="rounded-circle avatar-40"></div>
+                                       <div class="w-100">
+                                          <div class="d-flex flex-wrap justify-content-between">
+                                             <div class=" ms-3">
+                                                <h6>Anna Mull</h6>
+                                                <p class="mb-0">Sister</p>
+                                             </div>
+                                             <div class="edit-relation"><a href="#"><i class="ri-edit-line me-2"></i>Edit</a></div>
+                                          </div>
+                                       </div>
+                                    </li>
+                                    <li class="d-flex mb-4 align-items-center justify-content-between">
+                                       <div class="user-img img-fluid"><img src="../assets/images/user/03.jpg" alt="story-img" class="rounded-circle avatar-40"></div>
+                                       <div class="w-100">
+                                          <div class="d-flex justify-content-between">
+                                             <div class="ms-3">
+                                                <h6>Paige Turner</h6>
+                                                <p class="mb-0">Cousin</p>
+                                             </div>
+                                             <div class="edit-relation"><a href="#"><i class="ri-edit-line me-2"></i>Edit</a></div>
+                                          </div>
+                                       </div>
+                                    </li>
+                                 </ul>
+                              </div>
+                              <div class="tab-pane fade" id="v-pills-work-tab" role="tabpanel" aria-labelledby="v-pills-work-tab">
+                                 <h4 class="mb-3">Work</h4>
+                                 <ul class="suggestions-lists m-0 p-0">
+                                    <li class="d-flex mb-4 align-items-center">
+                                       <div class="user-img img-fluid"><i class="ri-add-fill"></i></div>
+                                       <div class="ms-3">
+                                          <h6><a href="{% url 'social_profile:add_work_user' %}">Add Work</a></h6>
+                                       </div>
+                                    </li>
+                                    {% for work_user in work_users %}
+                                    <li class="d-flex mb-4 align-items-center justify-content-between">
+                                       <div class="user-img img-fluid"><img src="{% static 'assets/images/work.png' %}" alt="story-img" class="rounded-circle avatar-40"></div>
+                                       <div class="w-100">
+                                          <div class="d-flex justify-content-between">
+                                             <div class="ms-3">
+                                                <h6>{{ work_user.company_name }}</h6>
+                                                <span>
+                                                    {{ work_user.start_date.month }}/{{ work_user.start_date.year }}
+                                                    -{% if work_user.end_date %}
+                                                        {{ work_user.end_date.month }}/{{ work_user.end_date.year }}
+                                                    {% else %}
+                                                        Now
+                                                    {% endif %}
+                                                </span>
+                                                <p class="mb-0">{{ work_user.position }}</p>
+                                             </div>
+                                             <div class="edit-relation">
+                                                <a href="{% url 'social_profile:edit_work_user' work_user.id %}"><i class="ri-edit-line"></i>Edit</a>
+                                                <a  style="color:red" href="{% url 'social_profile:delete_work_user' work_user.id %}" onclick="return confirm('Are you sure you want to delete?')">
+                                                    <i class="ri-delete-bin-line "></i>Delete
+                                                </a>
+                                            </div>
+                                            
+                                          </div>
+                                       </div>
+                                    </li>
+                                    {%endfor%}
+                                 </ul>
+                                 <h4 class="mt-3 mb-3">Education</h4>
+                                 <ul class="suggestions-lists m-0 p-0">
+                                    <li class="d-flex mb-4 align-items-center">
+                                       <div class="user-img img-fluid"><i class="ri-add-fill"></i></div>
+                                       <div class="ms-3">
+                                          <h6><a href="{% url 'social_profile:add_education_user' %}">Add Education</a></h6>
+                                       </div>
+                                    </li>
+                                    {% for education_user in education_users %}
+                                    <li class="d-flex mb-4 align-items-center">
+                                       <div class="user-img img-fluid"><img src="{% static 'assets/images/guar.png' %}" alt="story-img" class="rounded-circle avatar-40"></div>
+                                       <div class="w-100">
+                                          <div class="d-flex flex-wrap justify-content-between">
+                                             <div class="ms-3">
+                                                <h6>{{ education_user.school_name }}</h6>
+                                                
+                                                <p class="mb-0">{{ education_user.school_address }}</p>
+                                                <span> Graduation year: {{education_user.end_date.year}}</span>
+                                             </div>
+                                             <div class="edit-relation">
+                                                <a  href="{% url 'social_profile:edit_education_user' education_user.id %}">
+                                                    <i class="ri-edit-line "></i>Edit</a>
+                                                    <a style="color:red" href="{% url 'social_profile:delete_education_user' education_user.id %}" onclick="return confirm('Are you sure you want to delete?')">
+                                                        <i class="ri-delete-bin-line"></i>Delete
+                                                    </a>
+                                            </div>
+                                            
+                                          </div>
+                                       </div>
+                                    </li>
+                                    {% endfor %}
+                                 </ul>
+                              </div>
+                              <div class="tab-pane fade" id="v-pills-lived-tab" role="tabpanel" aria-labelledby="v-pills-lived-tab">
+                                 <h4 class="mb-3">Current City and Hometown</h4>
+                                 
+                                 <ul class="suggestions-lists m-0 p-0">
+                                    {% if places_user_latest %}
+                                    <li class="d-flex mb-4 align-items-center justify-content-between">
+                                       <div class="user-img img-fluid"><img src="{% static 'assets/images/places.jpg' %}" alt="story-img" class="rounded-circle avatar-40"></div>
+                                       <div class="w-100">
+                                          <div class="d-flex flex-wrap justify-content-between">
+                                             <div class="ms-3">
+                                                <h6>{{ places_user_latest.city }}</h6>
+                                                <p class="mb-0">{{ places_user_latest.district }}</p>
+                                                <p class="mb-0">Year:{{ places_user_latest.year_lived }}</p>
+                                             </div>
+                                             <div class="edit-relation"><a href="{% url 'social_profile:edit_places_user' places_user_latest.id %}"><i class="ri-edit-line me-2"></i>Edit</a>
+                                                <a style="color:red" href="{% url 'social_profile:delete_places_user' places_user_latest.id %}" onclick="return confirm('Are you sure you want to delete?')">
+                                                    <i class="ri-delete-bin-line"></i>Delete
+                                                </a>
+                                            </div>
+                                          </div>
+                                       </div>
+                                    </li>
+                                    {%endif%}
+                                 </ul>
+                                 
+                                 <h4 class="mt-3 mb-3">Other Places Lived</h4>
+                                 {% for place_user in places_users %}
+                                 {% if place_user != places_user_latest %}
+                                 <ul class="suggestions-lists m-0 p-0">
+                                    <li class="d-flex mb-4 align-items-center justify-content-between">
+                                       <div class="user-img img-fluid"><img src="{% static 'assets/images/places.jpg' %}" alt="story-img" class="rounded-circle avatar-40"></div>
+                                       <div class="w-100">
+                                          <div class="d-flex flex-wrap justify-content-between">
+                                             <div class="ms-3">
+                                                <h6>{{ place_user.city }}</h6>
+                                                <p class="mb-0">{{ place_user.district }}</p>
+                                                <p class="mb-0">Year: {{ place_user.year_lived }}</p>
+                                             </div>
+                                             <div class="edit-relation">
+                                                <a href="{% url 'social_profile:edit_places_user' place_user.id %}"><i class="ri-edit-line me-2"></i>Edit</a>
+                                                <a style="color:red" href="{% url 'social_profile:delete_places_user' place_user.id %}" onclick="return confirm('Are you sure you want to delete?')">
+                                                    <i class="ri-delete-bin-line"></i>Delete
+                                                </a>
+                                                
+                                                </div>
+                                               
+                                          </div>
+                                       </div>
+                                    </li>
+                                 </ul>
+                                 {% endif%}
+                                 {% endfor %}
+                                 <ul class="suggestions-lists m-0 p-0">
+                                    <li class="d-flex mb-4 align-items-center">
+                                       <div class="user-img img-fluid"><i class="ri-add-fill"></i></div>
+                                       <div class="ms-3">
+                                          <h6><a href="{% url 'social_profile:add_places_user' %}">Add Place</a></h6>
+                                       </div>
+                                    </li>
+                                 </ul> 
+                                 
+                              </div>
+                              <div class="tab-pane fade" id="v-pills-details-tab" role="tabpanel" aria-labelledby="v-pills-details-tab">
+                                 <h4 class="mb-3">About You</h4>
+                                 <p>{{user.profile.bio}}</p>
+                                 <h4 class="mt-3 mb-3">Email</h4>
+                                 <p>{{ user.username }}</p>
+                                 
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="tab-pane fade" id="friends" role="tabpanel">
+               <div class="card">
+                  <div class="card-body">
+                     <h2>Friends</h2>
+                     <div class="friend-list-tab mt-2">
+                        <ul class="nav nav-pills d-flex align-items-center justify-content-left friend-list-items p-0 mb-2">
+                           <li>
+                              <a class="nav-link active" data-bs-toggle="pill" href="#pill-closefriends" data-bs-target="#closefriends"> All friends</a>
+                           </li>
+                           <li>
+                              <a class="nav-link" data-bs-toggle="pill" href="#pill-recently-add" data-bs-target="#recently-add">Recently Added</a>
+                           </li>
+                           <li>
+                              <a class="nav-link" data-bs-toggle="pill" href="#pill-following" data-bs-target="#following">Following</a>
+                           </li>
+                           <li>
+                              <a class="nav-link" data-bs-toggle="pill" href="#pill-home" data-bs-target="#home-town"> Blocking</a>
+                           </li>
+                        </ul>
+                        <div class="tab-content">
+                           <div class="tab-pane fade active show" id="closefriends" role="tabpanel">
+                              <div class="card-body p-0">
+                                 <div class="row">
+                                    {% for friend in friends %}
+                                    <div class="col-md-6 col-lg-6 mb-3">
+                                       <div class="iq-friendlist-block">
+                                          <div class="d-flex align-items-center justify-content-between">
+                                             <div class="d-flex align-items-center">
+                                                <a href="#">
+                                                    <img style="width: 150px; height: 150px;" src="{{ friend.user.profile.avatar.url }}" alt="profile-img" class="img-fluid">
+                                                </a>
+                                                <div class="friend-info ms-3">
+                                                   <h5>{{ friend.user.last_name }} {{ friend.user.first_name }}</h5>
+                                                   <p class="mb-0">{{  friend.user.friendships.count }} friends</p>
+                                                </div>
+                                             </div>
+                                             <div class="card-header-toolbar d-flex align-items-center">
+                                                <div class="dropdown">
+                                                   <span class="dropdown-toggle btn btn-secondary me-2" id="dropdownMenuButton39" data-bs-toggle="dropdown" aria-expanded="true" role="button">
+                                                   <i class="ri-check-line me-1 text-white"></i> Friend
+                                                   </span>
+                                                   <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton39">
+                                                    {% if friend.friend.id in following_user_ids %}
+                                                        <a class="dropdown-item" href="{% url 'social_profile:unfollow_user' friend.user.id %}">Unfollow</a>
+                                                    {% else %}
+                                                        <a class="dropdown-item" href="{% url 'social_profile:follow_user' friend.user.id %}">Follow</a>
+                                                    {% endif %}
+                                                      <a class="dropdown-item" href="{% url 'social_profile:unfriend_user' friend.user.id %}">Unfriend</a>
+                                                      <a class="dropdown-item" href="{% url 'social_profile:block_user' friend.user.id %}">Block</a>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                    {%endfor%}
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="tab-pane fade" id="recently-add" role="tabpanel">
+                              <div class="card-body p-0">
+                                 <div class="row">
+                                    {% for recently_friend in recently_friends %}
+                                    <div class="col-md-6 col-lg-6 mb-3">
+                                       <div class="iq-friendlist-block">
+                                          <div class="d-flex align-items-center justify-content-between">
+                                             <div class="d-flex align-items-center">
+                                                <a href="#">
+                                                    <img  style="width: 150px; height: 150px;" src="{{ recently_friend.friend.profile.avatar.url }}" alt="profile-img" class="img-fluid">
+                                                </a>
+                                                <div class="friend-info ms-3">
+                                                   <h5>{{ recently_friend.friend.last_name }} {{ recently_friend.friend.first_name }}</h5>
+                                                   <p class="mb-0">{{ recently_friend.user.friendships.count }} friends</p>
+                                                </div>
+                                             </div>
+                                             <div class="card-header-toolbar d-flex align-items-center">
+                                                <div class="dropdown">
+                                                   <span class="dropdown-toggle btn btn-secondary me-2" id="dropdownMenuButton31" data-bs-toggle="dropdown" aria-expanded="true" role="button">
+                                                   <i class="ri-check-line me-1 text-white"></i> Friend
+                                                   </span>
+                                                   <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton31">
+                                                    {% if recently_friend in following_users %}
+                                                    <a class="dropdown-item" href="{% url 'social_profile:unfollow_user' recently_friend.friend.id %}">Unfollow</a>
+                                                    {% else %}
+                                                    <a class="dropdown-item" href="{% url 'social_profile:follow_user' recently_friend.friend.id %}">Follow</a>
+                                                    {%endif%}
+                                                    <a class="dropdown-item" href="{% url 'social_profile:unfriend_user' recently_friend.friend.id %}">Unfriend</a>
+                                                    <a class="dropdown-item" href="{% url 'social_profile:block_user' recently_friend.friend.id %}">Block</a>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                    {% endfor %}
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="tab-pane fade" id="following" role="tabpanel">
+                              <div class="card-body p-0">
+                                 <div class="row">
+                                    {%for following_user in following_users %}
+                                    <div class="col-md-6 col-lg-6 mb-3">
+                                       <div class="iq-friendlist-block">
+                                          <div class="d-flex align-items-center justify-content-between">
+                                             <div class="d-flex align-items-center">
+                                                <a href="#">
+                                                <img  style="width: 150px; height: 150px;" src="{{ following_user.friend.profile.avatar.url }}" alt="profile-img" class="img-fluid">
+                                                </a>
+                                                <div class="friend-info ms-3">
+                                                   <h5>{{ following_user.friend.last_name }} {{ following_user.friend.first_name }}</h5>
+                                                   <p class="mb-0">{{ following_user.friend.friendships.count }} friends</p>
+                                                </div>
+                                             </div>
+                                             <div class="card-header-toolbar d-flex align-items-center">
+                                                <div class="dropdown">
+                                                   <span class="dropdown-toggle btn btn-secondary me-2" id="dropdownMenuButton54" data-bs-toggle="dropdown" aria-expanded="true" role="button">
+                                                   <i class="ri-check-line me-1 text-white"></i> Friend
+                                                   </span>
+                                                   <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton54">
+                                                    {% if following_user in following_users %}
+                                                    <a class="dropdown-item" href="{% url 'social_profile:unfollow_user' following_user.friend.id %}">Unfollow</a>
+                                                    {% else %}
+                                                    <a class="dropdown-item" href="{% url 'social_profile:follow_user' following_user.friend.id %}">Follow</a>
+                                                    {%endif%}
+                                                    <a class="dropdown-item" href="{% url 'social_profile:unfriend_user' following_user.friend.id %}">Unfriend</a>
+                                                    <a class="dropdown-item" href="{% url 'social_profile:block_user' following_user.friend.id %}">Block</a>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                    {% endfor%}
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="tab-pane fade" id="home-town" role="tabpanel">
+                              <div class="card-body p-0">
+                                 <div class="row">
+                                    {% for block_user in blocked_users %}
+                                    <div class="col-md-6 col-lg-6 mb-3">
+                                       <div class="iq-friendlist-block">
+                                          <div class="d-flex align-items-center justify-content-between">
+                                             <div class="d-flex align-items-center">
+                                                <a href="#">
+                                                <img  style="width: 150px; height: 150px;" src="{{ block_user.friend.profile.avatar.url }}" alt="profile-img" class="img-fluid">
+                                                </a>
+                                                <div class="friend-info ms-3">
+                                                   <h5>{{block_user.friend.last_name}} {{block_user.friend.first_name}}</h5>
+                                                   <p class="mb-0">{{  block_user.friend.friendships.count }} friends</p>
+                                                </div>
+                                             </div>
+                                             <div class="card-header-toolbar d-flex align-items-center">
+                                                <div class="dropdown">
+                                                   <span class="dropdown-toggle btn btn-secondary me-2" id="dropdownMenuButton54" data-bs-toggle="dropdown" aria-expanded="true" role="button">
+                                                   <i class="ri-check-line me-1 text-white"></i> Blocked
+                                                   </span>
+                                                   <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton54">
+                                                      <a class="dropdown-item" href="{% url 'social_profile:unblock_user' block_user.friend.id %}">Unblock</a>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                    {%endfor%}
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="tab-pane fade" id="photos" role="tabpanel">
+               <div class="card">
+                  <div class="card-body">
+                     <h2>Photos</h2>
+                     <div class="friend-list-tab mt-2">
+                        <div class="tab-content">
+                           <div class="tab-pane fade active show" id="photosofyou" role="tabpanel">
+                              <div class="card-body p-0">
+                                 <div class="d-grid gap-2 d-grid-template-1fr-13">
+                                    {% for image in images_in_album %}
+                                    <div class="">
+                                        <div class="user-images position-relative overflow-hidden">
+                                            <a href="{% url 'social_profile:detail_image_profile' user_id=request.user.id image_id=image.id %}">
+                                                <img src="{{ image.image.url }}" class="img-fluid rounded" alt="Responsive image">
+                                            </a>
+                                            {% comment %} <a href="{% url 'social_profile:remove_image_from_album' album_id=user_album.id image_id=image.id %}" class="image-edit-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Remove">
+                                                <i class="ri-delete-bin-fill"></i>
+                                            </a> {% endcomment %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      
+   </div>
+</div>
+</div>
+</div>
+<script>
+   // Gắn sự kiện click vào nút xóa
+       const deleteButtons = document.querySelectorAll('.delete-post');
+       deleteButtons.forEach(button => {
+           button.addEventListener('click', function() {
+               const postId = button.dataset.postId;
+               deletePost(postId);
+           });
+       });
+
+       // Hàm xóa bài viết
+       function deletePost(postId) {
+           fetch(`/delete-post/${postId}/`, {
+               method: 'POST',
+               headers: {
+                   'X-CSRFToken': '{{ csrf_token }}',
+                   'Content-Type': 'application/json',
+               },
+           })
+           .then(response => {
+               if (response.ok) {
+                   // Xóa bài viết khỏi giao diện ngay lập tức
+                   const postElement = document.querySelector(`[data-post-id="${postId}"]`).parentElement;
+                   postElement.remove(); // Xóa phần tử sau khoảng thời gian nhỏ
+                   location.reload();
+               } else {
+                   console.error('Có lỗi xảy ra khi xóa bài viết');
+               }
+           })
+           .catch(error => {
+               console.error('Có lỗi xảy ra khi xóa bài viết:', error);
+           });
+       }
+   //Like post
+
+   //File input new post
+   document.getElementById('file-input').addEventListener('change', function() {
+       var fileInput = this;
+       var previewContainer = document.getElementById('preview-container');
+       // previewContainer.innerHTML = ''; // Xóa bỏ các hình ảnh đã hiển thị trước đó
+
+       if (fileInput.files && fileInput.files.length > 0) {
+           for (var i = 0; i < fileInput.files.length; i++) {
+           var file = fileInput.files[i];
+           var reader = new FileReader();
+
+           reader.onload = (function(file) {
+               return function(e) {
+               var imgContainer = document.createElement('div');
+               imgContainer.classList.add('preview-image-container');
+
+               var img = document.createElement('img');
+               img.src = e.target.result;
+               img.classList.add('preview-image');
+               imgContainer.appendChild(img);
+
+               var closeButton = document.createElement('span');
+               closeButton.innerHTML = 'x';
+               closeButton.classList.add('close-button');
+               imgContainer.appendChild(closeButton);
+
+               closeButton.addEventListener('click', function() {
+                   imgContainer.parentNode.removeChild(imgContainer);
+               });
+
+               previewContainer.appendChild(imgContainer);
+               };
+           })(file);
+
+           reader.readAsDataURL(file);
+           }
+       }
+       });
+  
+   // Xóa hình ảnh khi nhấp vào dấu "x"
+       var container = document.getElementById('preview-container');
+       container.addEventListener('click', function(event) {
+           if (event.target.classList.contains('close-button')) {
+           var image = event.target.parentNode;
+           container.removeChild(image);
+           }
+       });
+
+       // Tạo dấu "x" trên đầu hình ảnh
+       var images = document.querySelectorAll('.preview-image');
+       images.forEach(function(image) {
+           var closeButton = document.createElement('span');
+           closeButton.innerHTML = 'x';
+           closeButton.classList.add('close-button');
+           image.appendChild(closeButton);
+       });
+       
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% comment %} Comment {% endcomment %}
+<script>
+   $(document).ready(function () {
+       // Xử lý sự kiện khi form comment được gửi
+       $(".comment-form").submit(function (e) {
+           e.preventDefault();
+           const form = $(this);
+           const postId = form.data("post-id");
+           const content = form.find('input[name="content"]').val();
+           
+          
+           const imageInput = form.find('input[name="image_comment"]');
+           const imageData = imageInput.prop('files');
+           
+           const videoInput = form.find('input[name="video_comment"]');
+           const videoData = videoInput.prop('files');
+   
+           
+           const formData = new FormData();
+           formData.append('content', content);
+           formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+             // Xử lý nhiều hình ảnh
+           for (let i = 0; i < imageData.length; i++) {
+               formData.append('image_comment', imageData[i]);
+           }
+
+           // Xử lý nhiều video
+           for (let i = 0; i < videoData.length; i++) {
+               formData.append('video_comment', videoData[i]);
+           }  
+           const url = `/profile/add_comment_user/${postId}/`;
+           $.ajax({
+               url: url,
+               type: "POST",
+               data: formData,
+               processData: false,
+               contentType: false,
+               success: function (data) {
+                   const scrollPosition = $(window).scrollTop();
+                   form.find('input[name="content"]').val("");
+                   
+                   location.reload(function () {
+                       $(window).scrollTop(scrollPosition);
+                   });
+               },
+               error: function (xhr, textStatus, errorThrown) {
+                   // Xử lý lỗi nếu cần thiết
+                   console.error("Error adding comment:", errorThrown);
+               }
+           });
+       });
+   });
+   
+   </script>
+   
+{% comment %} Reply comment {% endcomment %}
+<script>
+   const csrfToken = '{{ csrf_token|escapejs }}';
+   // Rest of your JavaScript code
+</script>
+<script>
+   $(document).ready(function() {
+       $(".reply-button").click(function() {
+           var commentId = $(this).data("comment-id");
+           $("#reply-form-" + commentId).toggle();
+       });
+       /*
+       $(".reply-form").submit(function(e) {
+           e.preventDefault();
+           const form = $(this);
+           var commentId = $(this).data("comment-id");
+           const content = form.find('input[name="reply_content"]').val();
+       
+           const formData = new FormData();
+           formData.append("content", content);
+           formData.append("csrfmiddlewaretoken", csrfToken); 
+       
+           // Gửi yêu cầu fetch đến server
+           fetch(`/add_reply/${commentId}/`, {
+               method: "POST",
+               body: formData,
+           })
+           .then(response => response.json())
+           .then(data => {
+               const scrollPosition = $(window).scrollTop();
+               location.reload();
+               $(window).scrollTop(scrollPosition);
+               form.find('input[name="content"]').val("");
+           });
+       });
+       */
+   });
+   
+</script>
+{% comment %} Like reply {% endcomment %}
+<script>
+   // Like reply
+   document.addEventListener("DOMContentLoaded", function() {
+       const likeButtons = document.querySelectorAll(".like-button-reply");
+       likeButtons.forEach(likeButton => {
+           likeButton.addEventListener("click", function(event) {
+               event.preventDefault();
+               const replyID = this.getAttribute('data-reply-id');
+               const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+   
+               const isLiked = this.classList.contains('liked');
+               const likeCountElement = this.nextElementSibling; 
+               fetch(`/profile/like_reply_user/${replyID}/`, {
+                   method: "POST",
+                   headers: {
+                       "X-CSRFToken": csrfToken
+                   },
+                   body: new URLSearchParams({ is_liked: isLiked }),
+               })
+               .then(response => response.json())
+               .then(data => {
+                  
+                       likeCountElement.textContent = data.likes;
+                  
+               });
+           });
+       });
+   });
+       // Like comment
+       document.addEventListener("DOMContentLoaded", function() {
+           const likeButtons = document.querySelectorAll(".like-button-comment");
+           likeButtons.forEach(likeButton => {
+               likeButton.addEventListener("click", function(event) {
+                   event.preventDefault();
+                   const commentID = this.getAttribute('data-like-comment-id'); 
+                   const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+                   const isLiked = this.classList.contains('liked');
+                   const likeCountElement = likeButton.querySelector('.like-count-comment');
+                   fetch(`/profile/like_comment_user/${commentID}/`, {
+                       method: "POST",
+                       headers: {
+                           "X-CSRFToken": csrfToken
+                       },
+                       body: new URLSearchParams({ is_liked: isLiked }),
+                   })
+                   .then(response => response.json())
+                   .then(data => {
+                       likeCountElement.textContent = data.likes;
+                   });
+               });
+           });
+       });
+       
+      
+   </script>
+   <script>
+
+       document.addEventListener('DOMContentLoaded', function () {
+       var fileUploadButton = document.getElementById('fileUploadButton');
+       var fileInput = document.getElementById('fileInput');
+       var selectedImage = document.getElementById('selectedImage');
+
+       fileUploadButton.addEventListener('click', function () {
+           fileInput.click();
+       });
+
+       fileInput.addEventListener('change', function () {
+           var selectedFile = fileInput.files[0];
+           if (selectedFile) {
+               // Hiển thị hình ảnh đã chọn
+               var reader = new FileReader();
+               reader.onload = function (e) {
+                   selectedImage.src = e.target.result;
+                   selectedImage.style.display = 'block';
+               };
+               reader.readAsDataURL(selectedFile);
+
+               // Đặt tên tệp đã chọn vào trường input text
+               var replyContent = document.querySelector('.reply-form input[name="reply_content"]');
+               replyContent.value = selectedFile.name;
+           }
+       });
+   });
+
+   
+
+   </script>
+   <script>
+       var scrollPosition = localStorage.getItem('scrollPosition');
+       if (scrollPosition) {
+           window.scrollTo(0, scrollPosition);
+           localStorage.removeItem('scrollPosition'); // Xóa dữ liệu lưu trữ sau khi sử dụng
+       }
+   
+       
+       document.getElementById('send-button').addEventListener('click', function() {
+           localStorage.setItem('scrollPosition', window.scrollY);
+       });
+   </script>
+   
+   <script>
+       $(document).ready(function() {
+         // Lặp qua tất cả các phần tử có id là "postContent"
+         $("#content_video p").each(function() {
+           var postContent = $(this).html();
+     
+           // Kiểm tra xem nội dung có chứa URL của YouTube hay không
+           if (postContent.match(/https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_\-]+)&?[^ ]*/g)) {
+             // Thực hiện thay thế URL YouTube bằng thẻ iframe
+             postContent = postContent.replace(/https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_\-]+)&?[^ ]*/g, '<iframe width="610" height="406" src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe>');
+           }
+     
+           // Cập nhật nội dung của phần tử
+           $(this).html(postContent);
+         });
+       });
+     </script>
+     
+   <script>
+       document.getElementById("open-video-selector").addEventListener("click", function(event) {
+           event.preventDefault(); 
+       
+           // Kích hoạt sự kiện click trên thẻ "input" ẩn
+           var videoInput = document.getElementById("video-input");
+           videoInput.click();
+       });
+       
+   </script>
+   <style>
+       .video-container {
+           position: relative;
+       }
+   
+       .delete-button {
+           position: absolute;
+           top: 0;
+           right: 0;
+           background-color: red;
+           color: white;
+           border: none;
+           padding: 5px 10px;
+           cursor: pointer;
+       }
+   </style>
+   <script>
+       $(document).ready(function() {
+           $('#video-input').change(function() {
+               var videos = $(this)[0].files;
+               $('#preview-container').empty();
+               for (var i = 0; i < videos.length; i++) {
+                   var videoFile = videos[i];
+                   var videoURL = URL.createObjectURL(videoFile);
+                   var videoContainer = document.createElement('div');
+                   videoContainer.classList.add('video-container');
+                   var videoElement = document.createElement('video');
+                   videoElement.controls = true;
+                   videoElement.width = 280;
+                   videoElement.height = 200;
+                   var sourceElement = document.createElement('source');
+                   sourceElement.src = videoURL;
+                   sourceElement.type = 'video/mp4';
+                   videoElement.appendChild(sourceElement);
+                   var deleteButton = document.createElement('button');
+                   deleteButton.innerHTML = 'x';
+                   deleteButton.classList.add('delete-button');
+                   deleteButton.addEventListener('click', (function(videoContainer) {
+                       return function() {
+                           videoContainer.remove();
+                       };
+                   })(videoContainer));
+       
+                   // Thêm video và nút xóa vào container
+                   videoContainer.appendChild(videoElement);
+                   videoContainer.appendChild(deleteButton);
+       
+                   // Thêm container vào khung xem trước
+                   $('#preview-container').append(videoContainer);
+               }
+           });
+       });
+       </script>
+          
+       <script>
+           document.addEventListener('DOMContentLoaded', function () {
+               document.querySelectorAll('.file-input-comment').forEach(function (fileInput) {
+                   fileInput.addEventListener('change', function (event) {
+                       var postId = fileInput.getAttribute('data-post-id');
+                       var fileUploadButton = document.getElementById('fileUploadButtonComment-' + postId);
+                       handleFileInputChange(fileInput);  // Corrected line
+                   });
+               });
+           });
+           
+           function handleFileInputChange(fileInput) {
+               console.log('handleFileInputChange called');
+               var postId = fileInput.getAttribute('data-post-id');
+               var previewContainer = document.getElementById(`preview-file-comment-${postId}`);
+           
+               if (!previewContainer) {
+                   console.error('Preview container not found. postId:', postId);
+                   return;
+               }
+           
+               previewContainer.innerHTML = '';
+           
+               if (fileInput.files && fileInput.files.length > 0) {
+                   Array.from(fileInput.files).forEach(function (file) {
+                       var reader = new FileReader();
+           
+                       reader.onload = function (e) {
+                           var imgContainer = document.createElement('div');
+                           imgContainer.classList.add('preview-image-container');
+           
+                           var img = document.createElement('img');
+                           img.src = e.target.result;
+                           img.classList.add('preview-image');
+                           imgContainer.appendChild(img);
+           
+                           var closeButton = document.createElement('span');
+                           closeButton.innerHTML = 'x';
+                           closeButton.classList.add('close-button');
+                           imgContainer.appendChild(closeButton);
+           
+                           closeButton.addEventListener('click', function () {
+                               imgContainer.parentNode.removeChild(imgContainer);
+                           });
+           
+                           previewContainer.appendChild(imgContainer);
+                       };
+           
+                       reader.readAsDataURL(file);
+                   });
+               }
+           }
+       </script> 
+      
+       <script>
+           $(document).ready(function() {
+               $('.video-input').change(function() {
+                   console.log('Change event triggered');
+                   var videos = $(this)[0].files;
+                   console.log('Number of files:', videos.length);
+                   var postId = $(this).data('post-id');
+                   var previewContainer = $('#preview-file-comment-' + postId);
+           
+                   previewContainer.empty();
+                   for (var i = 0; i < videos.length; i++) {
+                       var videoFile = videos[i];
+                       var videoURL = URL.createObjectURL(videoFile);
+                       var videoContainer = document.createElement('div');
+                       videoContainer.classList.add('video-container');
+                       var videoElement = document.createElement('video');
+                       videoElement.controls = true;
+                       videoElement.width = 280;
+                       videoElement.height = 200;
+                       var sourceElement = document.createElement('source');
+                       sourceElement.src = videoURL;
+                       videoContainer.style.marginTop = '10px';
+                       sourceElement.type = 'video/mp4';
+                       videoElement.appendChild(sourceElement);
+                       var deleteButton = document.createElement('button');
+                       deleteButton.innerHTML = 'x';
+                       deleteButton.classList.add('delete-button');
+                       deleteButton.addEventListener('click', (function(videoContainer) {
+                           return function() {
+                               videoContainer.remove();
+                           };
+                       })(videoContainer));
+                       videoContainer.appendChild(videoElement);
+                       videoContainer.appendChild(deleteButton);
+                       previewContainer.append(videoContainer); 
+                   }
+               });
+           });
+           
+       </script>
+       <style>
+           #dropdown-toggle {
+               display: none; 
+           }
+           </style>            
+      
+          <script>
+         $(document).on('click', '.delete-comment-link', function() {
+   var commentId = $(this).data('comment-id');
+   var targetElement = $(this).data('target-element'); // Đây là vị trí trỏ chuột hiện tại
+
+   $.ajax({
+       url: '/delete-comment/' + commentId + '/',
+       method: 'POST',
+       data: { csrfmiddlewaretoken: csrf_token },
+       success: function(data) {
+
+           $(targetElement).remove();
+       }
+   });
+});
+
+</script>
+<script>
+function editComment(commentId) {
+   var commentContentElement = $('#comment_content_' + commentId);
+   var commentContent = commentContentElement.text();
+
+   var inputElement = document.createElement('input');
+   inputElement.type = 'text';
+   inputElement.value = commentContent;
+
+   commentContentElement.empty();
+   commentContentElement.append(inputElement);
+
+   var updateButton = document.createElement('button');
+   updateButton.className = 'btn btn-primary';
+   updateButton.innerText = 'Update';
+   updateButton.onclick = function () {
+       var updatedContent = inputElement.value;
+       updateComment(commentId, updatedContent);
+   };
+
+   var cancelButton = document.createElement('button');
+   cancelButton.className = 'btn btn-danger';
+   cancelButton.innerText = 'Cancel';
+   cancelButton.onclick = function () {
+       commentContentElement.text(commentContent);
+       addEditCancelButtons(commentId);
+   };
+
+   commentContentElement.append(updateButton);
+   commentContentElement.append(cancelButton);
+
+   var editButton = $('.dropdown-item-edit-' + commentId);
+   if (editButton) {
+       editButton.hide();
+   }
+}
+
+function addEditCancelButtons(commentId) {
+   var commentContentElement = $('#comment_content_' + commentId);
+
+   var updateButton = commentContentElement.find('button');
+   if (updateButton) {
+       updateButton.remove();
+   }
+
+   var editButton = $('.dropdown-item-edit-' + commentId);
+   if (editButton) {
+       editButton.show();
+   }
+}
+
+function updateComment(commentId, updatedContent) {
+   $.ajax({
+       url: `/profile/edit_comment_user/${commentId}/`,
+       type: 'POST',
+       data: {
+           new_content: updatedContent,
+           csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+       },
+       success: function () {
+           $('#comment_content_' + commentId).text(updatedContent);
+           addEditCancelButtons(commentId);
+       },
+       error: function () {
+           console.error('Error updating comment');
+       }
+   });
+}
+</script>
+<script>
+function editReply(replyID) {
+   var replyContentElement = $('#reply_content_' + replyID);
+   var replyContent = replyContentElement.text();
+
+   var inputElement = document.createElement('input');
+   inputElement.type = 'text';
+   inputElement.value = replyContent;
+
+   replyContentElement.empty();
+   replyContentElement.append(inputElement);
+
+   var updateButton = document.createElement('button');
+   updateButton.className = 'btn btn-primary';
+   updateButton.innerText = 'Update';
+   updateButton.onclick = function () {
+        var updatedContent = inputElement.value;
+       updateReply(replyID, updatedContent);
+   };
+
+   var cancelButton = document.createElement('button');
+   cancelButton.className = 'btn btn-danger';
+   cancelButton.innerText = 'Cancel';
+   cancelButton.onclick = function () {
+       replyContentElement.text(replyContent);
+       addEditCancelButtons(replyID);
+   };
+
+   replyContentElement.append(updateButton);
+   replyContentElement.append(cancelButton);
+
+   var editButton = $('.dropdown-item-edit-' + replyID);
+   if (editButton) {
+       editButton.hide();
+   }
+}
+
+function addEditCancelButtons(replyID) {
+   var replyContentElement = $('#reply_content_' + replyID);
+
+   var updateButton = replyContentElement.find('button');
+   if (updateButton) {
+       updateButton.remove();
+   }
+
+   var editButton = $('.dropdown-item-edit-' + replyID);
+   if (editButton) {
+       editButton.show();
+   }
+}
+
+function updateReply(replyID, updatedContent) {
+   $.ajax({
+       url: `/profile/edit_reply_user/${replyID}/`,
+       type: 'POST',
+       data: {
+           new_content: updatedContent,
+           csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+       },
+       success: function () {
+           $('#reply_content_' + replyID).text(updatedContent);
+           addEditCancelButtons(replyID);
+       },
+       error: function () {
+           console.error('Error updating reply');
+       }
+   });
+}
+</script>
+<script>
+function deleteComment(commentId) {
+   if (confirm('Are you sure you want to delete this comment?')) {
+       var scrollPosition = window.scrollY;
+
+       $.ajax({
+           url: '/profile/delete_comment_user/' + commentId + '/',  
+           type: 'POST',
+           data: {
+               csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+           },
+           success: function () {
+               location.reload();
+               window.scrollTo(0, scrollPosition);
+           },
+           error: function () {
+               console.error('Error deleting comment');
+           }
+       });
+   }
+}
+</script>
+<script>
+function deleteReply(replyID) {
+   if (confirm('Are you sure you want to delete this comment?')) {
+       
+       var scrollPosition = window.scrollY;
+
+       $.ajax({
+           url: '/profile/delete_reply_user/' + replyID + '/',  
+           type: 'POST',
+           data: {
+               csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+           },
+           success: function () {
+               location.reload();
+               window.scrollTo(0, scrollPosition);
+           },
+           error: function () {
+               console.error('Error deleting comment');
+           }
+       });
+   }
+}
+</script>
+<script>
+function addReply(commentId) {
+   var replyContent = $('#reply-form-' + commentId + ' input[name="reply_content"]').val();
+   console.log(replyContent)
+   const url = `/profile/add_reply_user/${commentId}/`;
+   $.ajax({
+       url: url,
+       type: 'POST',
+       data: {
+           reply_content: replyContent,
+           csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+       },
+       success: function () { 
+           var scrollPosition = window.scrollY;
+           location.reload();
+           window.scrollTo(0, scrollPosition);
+       },
+       error: function () {
+           console.error('Error adding reply');
+       }
+   });
+}
+</script>
+
+<script>
+function hidePost(postId) {
+
+   var confirmation = confirm('Are you sure you want to hide this post?');
+
+   if (confirmation) {
+       fetch(`/profile/hide_post_user/${postId}/`)
+           .then(response => response.json())
+           .then(data => {
+               if (data.status === 'success') {
+                   // Ẩn phần tử HTML của bài đăng khi ẩn thành công
+                   var postElement = document.getElementById(`post-${postId}`);
+                   if (postElement) {
+                       postElement.style.display = 'none';
+                   }
+                   alert('Post hidden successfully!');
+               } else {
+                   // Xử lý trường hợp ẩn bài đăng không thành công
+                   alert('Failed to hide post.');
+               }
+           })
+           .catch(error => {
+               console.error('Error:', error);
+               alert('An error occurred while hiding the post.');
+           });
+   }
+}    
+</script>
+
+<script>
+function closeComment(postId) {
+   const scrollPosition = window.scrollY;
+   var confirmation = confirm('Are you sure you want to close comment this post?');
+   // Send AJAX request to close comments for the post
+if(confirmation){
+   fetch(`/profile/close_comment_user/${postId}/`)
+   .then(response => response.json())
+   .then(data => {
+       if (data.success) {
+           window.location.reload();
+           window.scrollTo(0, scrollPosition);
+       } else {
+           console.error('Failed to close comments for the post');
+       }
+   })
+   .catch(error => {
+       console.error('Error:', error);
+   });
+}
+}   
+</script>
+<script>
+function openComment(postId) {
+   const scrollPosition = window.scrollY;
+   var confirmation = confirm('Are you sure you want to open comments for this post?');
+   // Send AJAX request to open comments for the post
+   if (confirmation) {
+       fetch(`/profile/open_comment_user/${postId}/`)
+           .then(response => response.json())
+           .then(data => {
+               if (data.success) {
+                   window.location.reload();
+                   window.scrollTo(0, scrollPosition);
+               } else {
+                   console.error('Failed to open comments for the post');
+               }
+           })
+           .catch(error => {
+               console.error('Error:', error);
+           });
+   }
+}
+</script>
+<script>
+//Like post
+document.addEventListener("DOMContentLoaded", function() {
+    const likeForms = document.querySelectorAll(".like-form");
+    likeForms.forEach(form => {
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+            const postID = this.querySelector('input[name="post_id"]').value;
+            const csrfToken = this.querySelector('input[name="csrfmiddlewaretoken"]').value;
+            const likeButton = this.querySelector('.like-button');
+
+            let isLiked = likeButton.classList.contains('liked');
+            const likeCountElement = this.querySelector('.like-count');
+
+            fetch("/profile/like_post/", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken
+                },
+                body: new URLSearchParams({ post_id: postID, is_liked: isLiked }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    if (isLiked) {
+                        
+                        likeButton.classList.remove('liked');
+                        likeCountElement.textContent = data.likes;
+                    } else {
+                        
+                        likeButton.classList.add('liked');
+                        likeCountElement.textContent = data.likes;
+                    }
+                } else {
+                    console.error(data.error);
+                }
+            });
+        });
+    });
+});
+</script>
+<script>
+    document.getElementById('edit-avatar-background').addEventListener('click', function () {
+        document.getElementById('avatar-input-background').click();
+    });
+
+    // Assuming you want to update the profile pic immediately after selecting a file
+    document.getElementById('avatar-input-background').addEventListener('change', function (event) {
+        const profilePicBackground = document.getElementById('profile-pic-background');
+        const fileInputBackground = event.target;
+
+        // Assuming the file input is for an image
+        if (fileInputBackground.files && fileInputBackground.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                profilePicBackground.src = e.target.result;
+            };
+
+            reader.readAsDataURL(fileInputBackground.files[0]);
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,38 @@
+from django.urls import path,re_path
+from . import views
+
+app_name ="social_fanpage"
+urlpatterns = [
+    path('fanpage_create/', views.fanpage_create, name='fanpage_create'),
+    path('fanpage_detail/<slug:slug>/', views.fanpage_detail, name='fanpage_detail'),
+    path('fanpage_list/', views.fanpage_list, name='fanpage_list'),
+    path("fanpage_post/<slug:slug>/", views.fanpage_post, name="fanpage_post"),
+    path('detail_image_post/<int:image_id>/', views.detail_image_post, name='detail_image_post'),
+    path('detail_image_profile/<int:user_id>/<int:image_id>/', views.detail_image_profile, name='detail_image_profile'),
+    path('detail_image_comment/<int:image_id>/', views.detail_image_comment, name='detail_image_comment'),
+    path('like_post/', views.like_post, name='like_post'),
+    path('delete-post/<int:post_id>/', views.delete_post, name='delete_post'),
+    path('edit-post/<int:post_id>/', views.edit_post, name='edit_post'),
+    path('delete-image/<int:image_id>/', views.delete_image, name='delete_image'),
+    path('delete-video/<int:video_id>/', views.delete_video, name='delete_video'),
+    path('add_comment/<int:post_id>/', views.add_comment, name='add_comment'),
+    path('add_reply/<int:comment_id>/', views.add_reply, name='add_reply'),
+    path('like_reply/<int:reply_id>/', views.like_reply, name='like_reply'),
+    path('like_comment/<int:comment_id>/', views.like_comment, name='like_comment'),
+    path('save_post_fanpage/<int:post_id>/', views.save_post_fanpage, name='save_post_fanpage'),
+    path('edit_comment/<int:comment_id>/', views.edit_comment, name='edit_comment'),
+    path('delete_reply/<int:reply_id>/', views.delete_reply, name='delete_reply'),
+    path('delete_comment/<int:comment_id>/', views.delete_comment, name='delete_comment'),
+    path('edit-postr/<int:post_id>/', views.edit_post, name='edit_post'),
+    path('hide_post/<int:post_id>/', views.hide_post, name='hide_post'),
+    path('close_comment/<int:post_id>/', views.close_comment, name='close_comment'),
+    path('open_comment/<int:post_id>/', views.open_comment, name='open_comment'),
+    path('delete-post/<int:post_id>/', views.delete_post, name='delete_post_fanpage'),
+    path('edit-fanpage/<slug:slug>/', views.edit_fanpage, name='edit_fanpage'),
+    path('admin_management/<slug:slug>/', views.admin_management, name='admin_management'),
+    path('remove_admin_management/<slug:slug>/', views.remove_admin_management, name='remove_admin_management'),
+    path('close_fanpage/<slug:slug>/', views.close_fanpage, name='close_fanpage'),
+    path('open_fanpage/<slug:slug>/', views.open_fanpage, name='open_fanpage'),
+    path('toggle-like/<int:fanpage_id>/', views.toggle_like, name='toggle_like'),
+    path('delete_fanpage/<slug:slug>/', views.delete_fanpage, name='delete_fanpage'),
+]

@@ -1,0 +1,48 @@
+{% extends 'society/index.html' %}
+{% block body %}
+{% load custom_filters %}
+{% load static %}
+<div id="content-page" class="content-page">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <div class="header-title">
+                        <h4 class="card-title">Edit Work</h4>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="acc-edit">
+                        <form method="post" action="{% url 'social_profile:edit_work_user' work_user.id%}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                            <label for="uname" class="form-label">Company name:</label>
+                            <input name=company value="{{ work_user.company_name }}" type="text" class="form-control" id="uname" placeholder="Enter your company...">
+                            </div>
+                            <div class="form-group">
+                            <label for="email" class="form-label">Position:</label>
+                            <input name=position type="text" value="{{ work_user.position }}" class="form-control" id="email" placeholder="Enter your position...">
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="dob" class="form-label">Start work day:</label>
+                                
+                                <input type="date" value="{{ work_user.start_date|date:'Y-m-d' }}" name="start_date" class="form-control" id="dob" placeholder="yyyy-mm-dd"/>                             </div>
+                            <div class="form-group col-sm-6">
+                                <label for="dob" class="form-label">End work day:</label>
+                                
+                                <input type="date" value="{{ work_user.end_date|date:'Y-m-d' }}" name="end_date" class="form-control" id="dob" placeholder="yyyy-mm-dd"/> 
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary me-2" onclick="return confirm('Are you sure you want to save?')">Submit</button>
+
+                        </form>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+      </div>
+    </div>
+{%endblock%}

@@ -1,0 +1,29 @@
+{% extends 'society/index.html' %}
+{% block body %}
+{% load custom_filters %}
+{% load bootstrap4 %}
+<style>
+  .button-container {
+    display: flex; 
+    gap: 10px; 
+  }
+</style>
+<div class="container mt-3">
+  <div class="col-sm-12">
+    <div class="card position-relative inner-page-bg bg-primary" style="height: 150px;">
+       <div class="inner-page-title ">
+          <h3 class="text-white">Edit group: {{ group.name }}</h3>
+          <a href="{% url 'social_network:user_admin_groups'%}" class="text-white" style="display: block; margin-top: 10px;">Back to group</a>
+       </div>
+    </div>
+  </div>
+</div>
+<div class="container mt-4">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% bootstrap_form form %}
+      <button type="submit">Save Changes</button>
+    </form>
+</div>
+
+{% endblock %}

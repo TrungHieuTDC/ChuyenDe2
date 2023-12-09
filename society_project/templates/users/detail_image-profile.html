@@ -1,0 +1,136 @@
+<!-- Lightbox/modal container -->
+<div id="lightbox-container" class="lightbox-container">
+    <span class="close-lightbox" onclick="closeLightbox()">&times;</span>
+    <img id="lightbox-image" class="lightbox-image" src="" alt="Full-screen Image">
+    <!-- Nút chuyển đến hình ảnh tiếp theo -->
+    <a href="#" onclick="changeImage(1)" class="next">&#8250;</a>
+    <!-- Nút quay lại hình ảnh trước đó -->
+    <a href="#" onclick="changeImage(-1)" class="prev">&#8249;</a>
+  </div>
+  
+  <style>
+    /* Styles for the lightbox/modal */
+    .lightbox-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      overflow: auto;
+  }
+  
+    .lightbox-image {
+        display: block;
+        margin: auto;
+        max-width: 90%;
+        max-height: 90%;
+    }
+  
+    .close-lightbox {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 30px;
+        color: #fff;
+        cursor: pointer;
+    }
+    .next,
+    .next,
+    .prev {
+        position: absolute;
+        top: 50%;
+        font-size: 30px;
+        color: #fff;
+        cursor: pointer;
+        padding: 20px; 
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+        border: none;
+        outline: none;
+        transition: background-color 0.3s ease; /* Smooth transition on hover */
+    }
+    
+    .next:hover,
+    .prev:hover {
+        background-color: rgba(0, 0, 0, 0.8); /* Darker background on hover */
+    }
+    
+    .next {
+        right: 15px;
+    }
+    
+    .prev {
+        left: 15px;
+    }
+  </style>
+  
+  <script>
+    var currentIndex = 0;
+    var postImages = [{% for image in images_in_album %}"{{ image.image.url }}", {% endfor %}];
+  
+    function closeLightbox() {
+        var lightboxContainer = document.getElementById('lightbox-container');
+        lightboxContainer.style.display = 'none';
+  
+        history.back();
+        //window.location.replace(document.referrer);
+    }
+  
+    function changeImage(direction) {
+        if (postImages.length <= 1) {
+           
+            return;
+        }
+  
+        var newIndex = currentIndex + direction;
+  
+      
+        if (newIndex < 0) {
+            newIndex = postImages.length - 1;
+        } else if (newIndex >= postImages.length) {
+            newIndex = 0;
+        }
+        currentIndex = newIndex;
+        var newImageUrl = postImages[newIndex];
+        document.getElementById('lightbox-image').src = newImageUrl;
+    }
+  
+    document.addEventListener('DOMContentLoaded', function () {
+        var lightboxContainer = document.getElementById('lightbox-container');
+        lightboxContainer.style.display = 'block';
+  
+
+        var clickedImageUrl = "{{ image.image.url }}";  // 
+        currentIndex = postImages.indexOf(clickedImageUrl);
+        
+        if (currentIndex !== -1) {
+            document.getElementById('lightbox-image').src = clickedImageUrl;
+        }
+  
+        // Hiển thị hoặc ẩn nút chuyển đến hình ảnh tiếp theo/quay lại
+        if (postImages.length <= 1) {
+            document.querySelector('.next').style.display = 'none';
+            document.querySelector('.prev').style.display = 'none';
+        }
+        document.addEventListener('keydown', handleKeyboardNavigation);
+    });
+    function handleKeyboardNavigation(event) {
+      switch (event.key) {
+          case 'ArrowLeft':
+              changeImage(-1); 
+              break;
+          case 'ArrowRight':
+              changeImage(1); 
+              break;
+          case 'Escape':
+              closeLightbox();
+              break;
+          default:
+              break;
+      }
+  }
+  </script>
+  

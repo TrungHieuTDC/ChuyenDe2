@@ -1,0 +1,276 @@
+{% extends 'society/index.html' %}
+{% block body %}
+
+<style>
+    #preview-container {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .preview-image-container {
+      position: relative;
+      display: inline-block;
+    }
+      .preview-image {
+        max-width: 90px; 
+        max-height: 70px;
+        float: left; 
+        margin: 10px; 
+        position: relative; 
+      }
+      .delete-image-button {
+        background: none;
+        border: none; 
+      }
+      #video-preview-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    .preview-video-container {
+        position: relative;
+        display: inline-block;
+        margin: 10px;
+    }
+    
+    .preview-video {
+        max-width: 240px;
+        max-height: 210px;
+        display: block;
+    }
+    
+    .delete-video-button {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+    }     
+</style>
+<div class="container mt-3">
+    <div class="col-sm-12">
+      <div class="card position-relative inner-page-bg bg-primary" style="height: 150px;">
+         <div class="inner-page-title ">
+            <h3 class="text-white">Edit post</h3>
+            <a href="{% url 'social_network:group_detail' group.slug %}" class="text-white" style="display: block; margin-top: 10px;">Back to group</a>
+         </div>
+      </div>
+    </div>
+  </div>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="container mt-4">
+        {{ post_form.as_p }}
+        <h6>Images</h6>
+        <ul id="preview-container">
+            {% for image in post.postimage_set.all %}
+                <li class="preview-image-container">
+                    <img class="preview-image" src="{{ image.image.url }}" alt="{{ image.description }}">
+                    <button class="delete-image-button" data-image-id="{{ image.id }}">X</button>
+                </li>
+            {% endfor %}
+        </ul>
+        <div id="preview-container" class="image-size">                                            
+        </div>
+        <input type="file" name="image" id="file-input"  multiple>   
+        <br>
+        <br>
+        <h6>Videos</h6>
+        <ul id="video-preview-container">
+            {% for video in post.videos.all %}
+                <li class="preview-video-container">
+                    <video class="preview-video" controls>
+                        <source src="{{ video.video.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <button class="delete-video-button" data-video-id="{{ video.id }}">X</button>
+                </li>
+            {% endfor %}
+        </ul>
+        <input type="file" name="video" id="video-input"  multiple>   
+        <br>
+        <input type="submit" value="Save" class="btn btn-success d-block w-100">
+    </div>
+</form>
+
+
+    <script src="https://cdn.ckeditor.com/4.16.2/standard-all/ckeditor.js"></script>
+    <script>
+        // Kích hoạt CKEditor cho trường 'content'
+        CKEDITOR.replace('id_content');
+    </script>
+        <script>
+            function showSuccessAlert() {
+                alert("Your Blog is edited successfully !");
+            }
+        </script>
+        
+        <script>
+            document.querySelectorAll('.delete-image-button').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var imageId = this.getAttribute('data-image-id');
+                    if (imageId) {
+                        // Xóa hình ảnh
+                        fetch('/delete-image/' + imageId + '/', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                                'Content-Type': 'application/json', // Đặt kiểu dữ liệu là JSON
+                            },
+                            body: JSON.stringify({}),
+                        })
+                        .then(function(response) {
+                            if (response.ok) {
+                                // Xóa thành công, có thể làm gì đó (ví dụ: cập nhật trang)
+                                window.location.reload(); // Cập nhật lại trang
+                            }
+                        });
+                    }
+                });
+            });
+//File input new post
+document.getElementById('file-input').addEventListener('change', function() {
+    var fileInput = this;
+    var previewContainer = document.getElementById('preview-container');
+    // previewContainer.innerHTML = ''; // Xóa bỏ các hình ảnh đã hiển thị trước đó
+
+    if (fileInput.files && fileInput.files.length > 0) {
+        for (var i = 0; i < fileInput.files.length; i++) {
+        var file = fileInput.files[i];
+        var reader = new FileReader();
+
+        reader.onload = (function(file) {
+            return function(e) {
+            var imgContainer = document.createElement('div');
+            imgContainer.classList.add('preview-image-container');
+
+            var img = document.createElement('img');
+            img.src = e.target.result;
+            img.classList.add('preview-image');
+            imgContainer.appendChild(img);
+
+            var closeButton = document.createElement('span');
+            closeButton.innerHTML = 'x';
+            closeButton.classList.add('close-button');
+            imgContainer.appendChild(closeButton);
+
+            closeButton.addEventListener('click', function() {
+                imgContainer.parentNode.removeChild(imgContainer);
+            });
+
+            previewContainer.appendChild(imgContainer);
+            };
+        })(file);
+
+        reader.readAsDataURL(file);
+        }
+    }
+    });
+
+// Xóa hình ảnh khi nhấp vào dấu "x"
+    var container = document.getElementById('preview-container');
+    container.addEventListener('click', function(event) {
+        if (event.target.classList.contains('close-button')) {
+        var image = event.target.parentNode;
+        container.removeChild(image);
+        }
+    });
+
+    // Tạo dấu "x" trên đầu hình ảnh
+    var images = document.querySelectorAll('.preview-image');
+    images.forEach(function(image) {
+        var closeButton = document.createElement('span');
+        closeButton.innerHTML = 'x';
+        closeButton.classList.add('close-button');
+        image.appendChild(closeButton);
+    });
+        </script>
+        <script>
+            document.querySelectorAll('.delete-video-button').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var videoId = this.getAttribute('data-video-id');
+                    if (videoId) {
+                        // Xóa video
+                        fetch('/profile/delete-video/' + videoId + '/', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({}),
+                        })
+                        .then(function(response) {
+                            if (response.ok) {
+                                window.location.reload(); // Cập nhật lại trang
+                            }
+                        });
+                    }
+                });
+            });
+            document.querySelectorAll('.delete-video-button').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var videoId = this.getAttribute('data-video-id');
+                    if (videoId) {
+                        // Xóa video
+                        fetch('/delete-video/' + videoId + '/', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({}),
+                        })
+                        .then(function(response) {
+                            if (response.ok) {
+                                window.location.reload(); 
+                            }
+                        });
+                    }
+                });
+            });
+        // File input cho video mới
+        document.getElementById('video-input').addEventListener('change', function() {
+            var videoInput = this;
+            var videoPreviewContainer = document.getElementById('video-preview-container');
+        
+            if (videoInput.files && videoInput.files.length > 0) {
+                for (var i = 0; i < videoInput.files.length; i++) {
+                    var file = videoInput.files[i];
+                    var reader = new FileReader();
+        
+                    reader.onload = (function(file) {
+                        return function(e) {
+                            var videoContainer = document.createElement('div');
+                            videoContainer.classList.add('preview-video-container');
+        
+                            var video = document.createElement('video');
+                            video.src = e.target.result;
+                            video.classList.add('preview-video');
+                            video.setAttribute('controls', 'controls');
+                            videoContainer.appendChild(video);
+        
+                            var deleteButton = document.createElement('button');
+                            deleteButton.innerHTML = 'x';
+                            deleteButton.classList.add('delete-video-button');
+                            deleteButton.setAttribute('data-video-id', 'new'); // Đặt data-video-id để phân biệt video mới
+                            videoContainer.appendChild(deleteButton);
+        
+                            deleteButton.addEventListener('click', function() {
+                                videoContainer.parentNode.removeChild(videoContainer);
+                            });
+        
+                            videoPreviewContainer.appendChild(videoContainer);
+                        };
+                    })(file);
+        
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+                
+        </script> 
+{% endblock %}
+
+{% block js %}
+{% endblock %}

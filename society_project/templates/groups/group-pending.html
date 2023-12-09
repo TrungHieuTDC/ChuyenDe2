@@ -1,0 +1,59 @@
+{% extends 'society/index.html' %}
+{% block body %}
+{% load custom_filters %}
+<style>
+  .button-container {
+    display: flex; 
+    gap: 10px; 
+  }
+</style>
+<div class="container mt-3">
+  <div class="col-sm-12">
+    <div class="card position-relative inner-page-bg bg-primary" style="height: 150px;">
+       <div class="inner-page-title ">
+          <h3 class="text-white">Approval to join the group </h3>
+          <a href="{% url 'social_network:group_detail' group.slug %}" class="text-white" style="display: block; margin-top: 10px;">Back to group</a>
+       </div>
+    </div>
+  </div>
+</div>
+<div class="container mt-4">
+{%if pending_members%}
+{% for request in pending_members  %}
+  <div class="col-md-12">
+    <div class="card">
+        <div class="card-body p-0">
+            <ul class="todo-task-lists m-0 p-0">
+            <li class="d-flex align-items-center p-3">
+                <div class="user-img img-fluid"><img src="{{ request.user.profile.avatar.url }}" alt="story-img" class="rounded-circle avatar-40"></div>
+                      <div class="d-flex align-items-center justify-content-between w-100">
+                    <div class="ms-3">
+                        <h6 class="d-inline-block">{{ request.user.last_name }} {{ request.user.first_name }}</h6>
+                        <span class="badge bg-warning ms-0 ms-md-3 my-1 my-md-0 text-white">Pending</span>
+                        <p class="mb-0">{{ request.joined_at|custom_timesince }}</p>
+                    </div>
+                    <div class="button-container">
+                      <form method="post" action="{% url 'social_network:approve_join_group' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="membership_id" value="{{ request.id }}">
+                        <button class= "btn-success " type="submit">Accept join</button>
+                      </form>
+                      <form method="post" action="{% url 'social_network:reject_join_group' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="membership_id" value="{{ request.id }}">
+                        <button class= "btn-danger " type="submit">Reject join</button>
+                      </form>
+                    </div>
+               </div>
+            </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{%else%}
+<h3>Great !!! All pending have been processed !</h3>
+{%endif%}
+</div>
+
+{% endblock %}

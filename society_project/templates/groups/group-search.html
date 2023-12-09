@@ -1,0 +1,1307 @@
+{% extends 'society/index.html' %}
+{% block body %}
+{% load custom_filters %}
+{%load static %}
+<style>
+    .like-form {
+        display: flex; 
+        align-items: center; 
+    }
+    .reply {
+        margin-bottom: 10px;
+    }
+    .comment-main {
+        display: inline-block;
+        vertical-align: middle;
+        max-width: 80%;
+        background-color: rgb(240, 242, 245);
+        border-radius: 8px;
+        padding: 5px;
+    }
+    .reply-content {
+        display: inline-block;
+        vertical-align: middle;
+        max-width: 80%;
+        background-color: rgb(240, 242, 245);
+        border-radius: 8px;
+        padding: 5px;
+        
+    }
+    .like-button {
+       
+        background-image: url("{% static 'assets/images/iduck_1.png' %}"); 
+        background-size: contain;
+        background-color: white;
+        width: 30px;
+        height: 30px;
+        border: none;
+        outline: none;
+        cursor: pointer;
+    }
+    .like-count {
+        margin-left: 5px; 
+    }
+    #preview-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .preview-image-container {
+  position: relative;
+  display: inline-block;
+}
+  .preview-image {
+    max-width: 90px; 
+    max-height: 70px;
+    float: left; 
+    margin: 10px; 
+    position: relative; 
+  }
+  
+  .close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: white;
+  background:red;
+  padding: 3px;
+  cursor: pointer;
+}
+.delete-post {
+  background: none;
+  border: none; 
+}
+.video-container {
+    width: 512px;  
+    height: 384px; 
+}
+</style>
+<div class="container  mt-3">
+  <div class="col-sm-8">
+    <div class="card position-relative inner-page-bg bg-primary" style="height: 150px;">
+       <div class="inner-page-title ">
+          <h3 class="text-white">Search for: <span style="color: yellow">{{query}}</span> </h3>
+          <a href="{%  url 'social_network:group_detail' group.slug %}" class="text-white" style="display: block; margin-top: 10px;">Back to group</a>
+         </div>
+       </div>
+    </div>
+  </div>
+<div class="container mt-4">
+    <div class="col-lg-8">
+    <div class="card">
+        <div class="card-body">
+            {% for post in result_posts %}
+            {% if request.user not in post.hidden_for_users.all %}
+            <div class="post-item" id="post-{{ post.id }}">
+                <div class="user-post-data py-3">
+                    <div class="d-flex justify-content-between">
+                        <div class=" me-3">
+                            
+                            <img class="rounded-circle " width="52px" height="52px" src="{{ post.user.profile.avatar.url }}" alt="">
+                        </div>
+                        <div class="w-100">
+                            <div class="d-flex justify-content-between">
+                                <div class="">
+                                    <h5 class="mb-0 d-inline-block"><a href="#" class="">{{ post.user.last_name }}</a></h5>
+                                    <div style="display: flex; align-items: center;">
+                                        {% if post.user not in group.admins.all %}
+                                        <img  class="rounded-circle" width="15px" height="15px" src="{% static '/assets/images/icon/member.jpg' %}" alt="Member" title="Member"> 
+                                        {%else%}
+                                        <img style="margin-bottom: 5px;" class="rounded-circle" width="15px" height="15px" src="{% static '/assets/images/icon/admin.png' %}" alt="Admin" title="Admin"> 
+                                        {%endif%}
+                                        <p class="mb-0" style="margin-left: 5px;"> {{ post.created_at|custom_timesince }}</p>
+                                    </div>
+                                </div>
+    
+                                <div class="card-post-toolbar">
+                                    <div class="dropdown">
+                                        <span class="dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                                        <i class="ri-more-fill"></i>
+                                        </span>
+                                        <div class="dropdown-menu m-0 p-0">
+                                            <a class="dropdown-item p-3" href="{% url 'social_network:save_post' post.id %}">
+                                                <div class="d-flex align-items-top">
+                                                <i class="ri-save-line h4"></i>
+                                                <div class="data ms-2">
+                                                    <button  class="delete-post" type="button">Save Post</button>
+                                                    <p class="mb-0">Add this to your saved items</p>
+                                                </div>
+                                                </div>
+                                            </a>
+                                            {% if post.user == request.user %}
+                                            <a class="dropdown-item p-3" href="{% url 'social_network:edit_post' post.id %}">
+                                                <div class="d-flex align-items-top">
+                                                  <i class="ri-pencil-line h4"></i>
+                                                <div class="data ms-2">
+                                                    <button  class="delete-post" type="button">Edit Post</button>
+                                                    <p class="mb-0">Update your post and saved items</p>
+                                                </div>
+                                                </div>
+                                            </a>
+                                            {% endif %}
+                                            <a class="dropdown-item p-3" onclick="hidePost({{ post.id }})">
+                                                <div class="d-flex align-items-top">
+                                                    <i class="ri-close-circle-line h4"></i>
+                                                    <div class="data ms-2">
+                                                        <h6>Hide From Timeline</h6>
+                                                        <p class="mb-0">See fewer posts like this.</p>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            {% if post.user == request.user or request.user in group.admins.all%}
+                                            <a class="dropdown-item p-3">
+                                                <div class="d-flex align-items-top">
+                                                   <i class="ri-delete-bin-7-line h4"></i>
+                                                <div class="data ms-2">
+                                                    
+                                                        <button class="delete-post" onclick="hidePost({{ post.id }})"><h6>Delete</h6></button>
+                                                    
+                                                    <p class="mb-0">Remove thids Post on Timeline</p>
+                                                </div>
+                                                </div>
+                                            </a>
+                                            {% endif %}
+                                            {% if post.user == request.user or request.user in group.admins.all %}
+                                                {% if post.comments_closed %}
+                                                    <a class="dropdown-item p-3">
+                                                        <div class="d-flex align-items-top">
+                                                            <i class="fa fa-unlock h4"></i>
+                                                            <div class="data ms-2">
+                                                                <button class="delete-post" onclick="openComment({{ post.id }})">
+                                                                    <h6>Open comment this post</h6>
+                                                                </button>
+                                                                <p class="mb-0">Turn on comment on Post</p>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                {% else %}
+                                                    <a class="dropdown-item p-3">
+                                                        <div class="d-flex align-items-top">
+                                                            <i class="fa fa-lock h4"></i>
+                                                            <div class="data ms-2">
+                                                                <button class="delete-post" onclick="closeComment({{ post.id }})">
+                                                                    <h6>Close comment this post</h6>
+                                                                </button>
+                                                                <p class="mb-0">Turn off comment on Post</p>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                {% endif %}
+                                            {% endif %}
+                                                                                                        
+                                            <a class="dropdown-item p-3" href="#">
+                                                <div class="d-flex align-items-top">
+                                                   <i class="ri-notification-line h4"></i>
+                                                <div class="data ms-2">
+                                                    <h6>Notifications</h6>
+                                                    <p class="mb-0">Turn on notifications for this post</p>
+                                                </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="content_video">
+                    <p id="postContent">{% autoescape off %}{{ post.content }}{% endautoescape %}</p>
+                  </div>
+                
+                <div class="user-post">
+                    <a href="javascript:void();" >
+                        {% if post.postimage_set.all %}
+                            {% with post_images=post.postimage_set.all %}
+    
+                            {% if post_images.count == 1 %}
+                            <a href="{% url 'social_network:detail_image' post_images.0.id %}" class="detail-link">
+                                <img src="{{ post_images.0.image.url }}" alt="post-image" class="w-100" width="610px" height="406px" />
+                            </a>
+                        {% elif post_images.count == 2 %}
+                            <div class="image-container">
+                                <a href="{% url 'social_network:detail_image' post_images.0.id %}" class="detail-link">
+                                    <img src="{{ post_images.0.image.url }}" alt="post-image" width="610px" height="303px" style="margin: 1px; border: 1px double gray;"/>
+                                </a>
+                                <a href="{% url 'social_network:detail_image' post_images.1.id %}" class="detail-link">
+                                    <img src="{{ post_images.1.image.url }}" alt="post-image" width="610px" height="303px" style="margin: 1px; border: 1px double gray;"/>
+                                </a>
+                            </div>
+                                {% elif post_images.count == 3 %}
+                                <a href="{% url 'social_network:detail_image' image_id=post_images.0.id %}">
+                                    <img src="{{ post_images.0.image.url }}" alt="post-image" width="610px" height="403px" style="margin: 1px; border: 1px double gray;"/>
+                                </a>
+    
+                                    <div class="image-container">                         
+                                        <div class="w-50" style="float: left;">
+                                            <a href="{% url 'social_network:detail_image' image_id=post_images.1.id %}">
+                                                <img src="{{ post_images.1.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                            </a>
+                                        </div>
+                                        <div class="w-50" style="float: left;">
+                                            <a href="{% url 'social_network:detail_image' image_id=post_images.2.id %}">
+                                                <img src="{{ post_images.2.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                            </a>
+                                        </div>
+                                        <div style="clear: both;"></div>
+                                    </div>
+                                {% elif post_images.count == 4 %}
+                                    <div class="image-container">
+                                        <div class="image-container">
+                                            <div class="w-50" style="float: left;">
+                                                <a href="{% url 'social_network:detail_image' image_id=post_images.0.id %}">
+                                                    <img src="{{ post_images.0.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                </a>
+                                            </div>
+                                            <div class="w-50" style="float: left;">
+                                                <a href="{% url 'social_network:detail_image' image_id=post_images.1.id %}">
+                                                    <img src="{{ post_images.1.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                </a>
+                                            
+                                            </div>
+                                            <div style="clear: both;"></div>
+                                        </div>
+                                        <div class="image-container">
+                                            <div class="w-50" style="float: left;">
+                                                <a href="{% url 'social_network:detail_image' image_id=post_images.2.id %}">
+                                                    <img src="{{ post_images.2.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                </a>
+                                            </div>
+                                            <div class="w-50" style="float: left;">
+                                                <a href="{% url 'social_network:detail_image' image_id=post_images.3.id %}">
+                                                    <img src="{{ post_images.3.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                                </a>
+                                            </div>
+                                            <div style="clear: both;"></div>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                <div class="image-container">
+                                    <div class="image-container">
+                                        <div class="w-50" style="float: left;">
+                                            <a href="{% url 'social_network:detail_image' image_id=post_images.0.id %}">
+                                                <img src="{{ post_images.0.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                            </a>
+                                        </div>
+                                        <div class="w-50" style="float: left;">
+                                            <a href="{% url 'social_network:detail_image' image_id=post_images.1.id %}">
+                                                <img src="{{ post_images.1.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                            </a>
+                                        </div>
+                                        <div style="clear: both;"></div>
+                                    </div>
+                                    <div class="image-container">
+                                        <div class="w-50" style="float: left;">
+                                            <a href="{% url 'social_network:detail_image' image_id=post_images.2.id %}">
+                                                <img src="{{ post_images.2.image.url }}" alt="post-image" width="305px" height="406px" style="margin: 1px; border: 1px double gray;" />
+                                            </a>
+                                        </div>
+                                        <div class="w-50" style="float: left; position: relative;">
+                                            <a href="{% url 'social_network:detail_image' image_id=post_images.3.id %}">
+                                                <img src="{{ post_images.3.image.url }}" alt="post-image" width="305px" height="406px" style="filter: blur(5px); margin: 1px;" />
+                                            </a>
+                                            <div class="overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 10px; font-size: 70px; color: black">
+                                                +{{ post_images.count|add:"-4" }}
+                                            </div>
+                                        </div>
+                                        <div style="clear: both;"></div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            
+                            {% endwith %}
+                        {% endif %}
+                        {% for video in post.videos.all %}
+                                <video controls width="610px" height="406px">
+                                    <source src="{{ video.video.url }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                        {% endfor %}
+                    
+                    </a>
+                </div>
+                
+                <div class="comment-area mt-3">
+                    {% comment %} justify-content-between {% endcomment %}
+                    <div class="d-flex  align-items-center flex-wrap"> 
+                        <div class="like-block position-relative d-flex align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="like-data">
+                                <div class="dropdown">
+                                    <span class="dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                                    <img src="../assets/images/icon/01.png" class="img-fluid" alt="">
+                                    </span>
+                                    <div class="dropdown-menu py-2">
+                                        <a class="ms-2 me-2" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Like"><img src="../assets/images/icon/01.png" class="img-fluid" alt=""></a>
+                                        <a class="me-2" href="#"  data-bs-toggle="tooltip" data-bs-placement="top" title="Love"><img src="../assets/images/icon/02.png" class="img-fluid" alt=""></a>
+                                        <a class="me-2" href="#"  data-bs-toggle="tooltip" data-bs-placement="top" title="Happy"><img src="../assets/images/icon/03.png" class="img-fluid" alt=""></a>
+                                        <a class="me-2" href="#"  data-bs-toggle="tooltip" data-bs-placement="top" title="HaHa"><img src="../assets/images/icon/04.png" class="img-fluid" alt=""></a>
+                                        <a class="me-2" href="#"  data-bs-toggle="tooltip" data-bs-placement="top" title="Think"><img src="../assets/images/icon/05.png" class="img-fluid" alt=""></a>
+                                        <a class="me-2" href="#"  data-bs-toggle="tooltip" data-bs-placement="top" title="Sade" ><img src="../assets/images/icon/06.png" class="img-fluid" alt=""></a>
+                                        <a class="me-2" href="#"  data-bs-toggle="tooltip" data-bs-placement="top" title="Lovely"><img src="../assets/images/icon/07.png" class="img-fluid" alt=""></a>
+                                    </div>
+                                </div>
+                                </div>
+                               
+                                <div class="total-like-block ms-2 me-3" style="float: left;">
+                                <div class="dropdown">
+                                    {% if not post.comments_closed and not is_banned %}
+                                    <form method="POST" class="like-form " >
+                                        {% csrf_token %}
+                                        <input type="hidden" name="post_id" value="{{ post.id }}">
+                                        <button type="submit" class="like-button "></button>
+                                        <span class="like-count">{{ post.likes.count }}</span>
+                                    </form>
+                                    {% else %}
+                                    <form method="POST" class="like-form " >
+                                        {% csrf_token %}  
+                                        <button type="submit" class="like-button "></button>
+                                        <span class="like-count">{{ post.likes.count }}</span>
+                                    </form>
+                                    {% endif %}
+                                    <span class="dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                                    </span> 
+                                    <div class="dropdown-menu">
+                                        {% for like in post.likes.all %}
+                                        <a class="dropdown-item" href="#">{{ like.user.last_name }}</a>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                </div>
+                                </div>
+                            </div>
+                            <div class="total-comment-block">
+                                <div class="dropdown">
+                                <span class="dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                                    <!-- {{  total_comments }} Comments -->
+                                    {{post.comments.count}} comment
+                                    
+                                    
+                                </span>
+                                <div class="dropdown-menu">
+                                    {% for comment in post.comments.all|unique_users %}
+                                        <a class="dropdown-item" href="#">{{ comment.user.last_name }}</a>
+                                    {% endfor %}
+                                    
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="share-block d-flex align-items-center feather-icon mt-2 mt-md-0" style="margin-left: auto;">
+                            <a href="javascript:void();" data-bs-toggle="offcanvas" data-bs-target="#share-btn" aria-controls="share-btn"><i class="ri-share-line"></i>
+                            <span class="ms-1">99 Share</span></a>
+                        </div>
+                    </div>
+                    <hr>
+                    <ul class="post-comments p-0 m-0 comments" >
+                        {% for comment in comments %}
+                        {% if comment.post == post %}
+                        <li id="comments-{{ post.id }}" >
+                            <div class="d-flex" style="margin-top:15px">
+                                <div class="user-img">
+                                <img src="{{ comment.user.profile.avatar.url }}" alt="userimg" class="avatar-35 rounded-circle img-fluid">
+                                </div>
+                                <div class="comment-data-block ms-3">
+                                    <div class="d-flex" >
+                                        <div class="comment-main" id="comment-main">
+                                            <h6>{{ comment.user.last_name }}</h6>
+                                            <p id="comment_content_{{ comment.id }}">{{ comment.content }}</p> 
+                                        </div>
+                                        {% if user.is_authenticated and user == comment.user or request.user in group.admins.all  or request.user == comment.post.user%}                                                        <div class="dropdown">
+                                            <div   id="post-option"  data-bs-toggle="dropdown">
+                                                <i class="ri-more-fill h4"></i>
+                                            </div>
+                                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="post-option" >
+                                                <a class="dropdown-item" onclick="deleteComment({{ comment.id }})">Delete</a>
+                                                <a class="dropdown-item dropdown-item-edit-{{ comment.id }}"  onclick="editComment({{ comment.id }})">Edit</a>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>  
+                                    <div class="comment-media">
+                                        
+                                        {% for image in comment.images.all %}
+                                        <a href="{% url 'social_network:detail_image_comment' image_id=image.id %}">
+                                            <img src="{{ image.image.url }}" width="200" height="100" alt="Comment Image">
+                                        </a>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="comment-media">
+                                        {% for video in comment.videos.all %}
+                                            <div class="video-container">
+                                                <video controls width="512" height="384">
+                                                    <source src="{{ video.video.url }}" type="video/mp4">
+                                                </video>
+                                            </div>
+                                        {% endfor %}
+                                    </div>              
+                                <div class="d-flex flex-wrap align-items-center comment-activity">
+                                    {% if not post.comments_closed and not is_banned %}
+                                    <button class="like-button-comment " style="background: none; border: none; display: flex; align-items: center;" data-like-comment-id="{{ comment.id }}">
+                                        <span style="color: #60b8ff; margin-top: 0; margin-right: 5px;">Like</span>
+                                        <a href="javascript:void();" class="like-count-comment">{{ comment.likes.count }}</a>
+                                    </button>
+                                    <a class="btn btn-primary btn-sm reply-button d-inline-block" style="background: none; border: none; "  data-comment-id="{{ comment.id }}">Reply</a>
+                                    <a href="javascript:void();">{{ comment.created_at|custom_timesince }}</a>
+                                   {% else %} 
+                                   {% comment %} <button class="like-button-comment " style="background: none; border: none; display: flex; align-items: center;" data-like-comment-id="{{ comment.id }}"> {% endcomment %}
+                                    <span style="color: #60b8ff; margin-top: 0; margin-right: 5px;">Like</span>
+                                    <a href="javascript:void();" class="like-count-comment">{{ comment.likes.count }}</a>
+                                    </button>
+                                    <a class="btn btn-primary btn-sm reply-button d-inline-block" style="background: none; border: none; " >Reply</a>
+                                    <a href="javascript:void();">{{ comment.created_at|custom_timesince }}</a>
+                                   {% endif %}
+                                </div>
+                                <div class="reply-container" id="reply-form-{{ comment.id }}" data-comment-id="{{ comment.id }}" style="display: none;">
+                                    <form class="reply-form" data-comment-id="{{ comment.id }}" id="reply-form-{{ comment.id }}">
+                                        {% csrf_token %}
+                                        <input type="text" class="form-control" name="reply_content" placeholder="Viết phản hồi của bạn..." required>
+                                        <button type="button" class="btn btn-primary btn-sm reply-button" onclick="addReply({{ comment.id }})">Gửi</button>
+                                    </form>
+                                </div>
+                                <div class="d-flex flex-wrap align-items-center comment-activity">
+                                    <div class="replies ">
+                                        {% for reply in comment.replies.all %}
+                                            <div class="reply d-flex flex-wrap " >
+                                                <img src="{{ reply.user.profile.avatar.url }}" style="margin-top: 0px; margin-right: 15px" alt="userimg" class="avatar-35 rounded-circle img-fluid">
+                                                <div class="reply-content">
+                                                    <span style="margin-top:15px"><strong>{{ reply.user.last_name }}</strong></span>
+                                                    <p class="reply-text" id="reply_content_{{ reply.id }}">{{ reply.text }}</p> 
+                                                </div>    
+                                                {% if user.is_authenticated and user == reply.user or request.user in group.admins.all %}
+                                                <div class="dropdown">
+                                                    <div   id="post-option"  data-bs-toggle="dropdown">
+                                                        <i class="ri-more-fill h4"></i>
+                                                    </div>
+                                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="post-option" >
+                                                        <a class="dropdown-item" onclick="deleteReply({{ reply.id }})">Delete</a>
+                                                        <a class="dropdown-item dropdown-item-edit-{{ reply.id }}"  onclick="editReply({{ reply.id }})">Edit</a>
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="d-flex flex-wrap" style="margin-left: 45px">
+                                                <button class="like-button-reply" data-reply-id="{{ reply.id }}" style="background: none; border: none; ">
+                                                   <p style="color: #60b8ff; margin-top: -1px" > Like</p>
+                                                </button>
+                                                <a href="javascript:void();" class="like-count">{{ reply.likes.count }}</a>
+                                                <a style="padding-left: 15px;" href="javascript:void();">{{ reply.created_at | custom_timesince }}</a>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <span> {{ commnet.created_at }} </span>
+                                </div>
+                               
+                            </div>
+                        </li>
+                       
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                    {% if not post.comments_closed %}
+                    {% if not is_banned %}
+                    <form data-post-id="{{ post.id }}"  class="comment-text d-flex align-items-center mt-3 comment-form">
+                        {% csrf_token %}
+                              <input type="text" id="comment-content" name="content" class="form-control rounded" placeholder="Enter Your Comment" >                                           
+                        <div class="comment-attagement d-flex">
+                            <label for="file-input-comment-{{ post.id }}">
+                                <a id="fileUploadButtonComment-{{ post.id }}"><i class="ri-camera-line me-3"></i></a>
+                            </label>
+                            <input type="file" name="image_comment" id="file-input-comment-{{ post.id }}" class="file-input-comment" data-post-id="{{ post.id }}" style="display: none;" multiple>
+    
+                            <label for="video-input-comment-{{ post.id }}" class="video-label">
+                                <a id="videoUploadButtonComment-{{ post.id }}"><i class="ri-link me-3"></i></a>
+                            </label>
+                            <input type="file" name="video_comment" id="video-input-comment-{{ post.id }}" class="video-input-comment video-input" data-post-id="{{ post.id }}" style="display: none;" multiple accept="video/*">
+                            <button id="comment-submit" type="submit" class="btn btn-primary">Send</button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <p style="background-color: #F0F2F5; padding: 10px 134px; margin: 13px;">
+                        You are banned and cannot comment.</p>
+                    {% endif %}
+                    {% else %}
+                    <p style="margin-top: 30px; color:black; background-color: #ccc;padding: 12px 180px;; border-radius: 5px;">Comment is closed for this post</p>
+    
+                    {% endif %}
+                    <div class="other-option">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <div class="user-img me-3"> 
+                                    <div id="preview-file-comment-{{ post.id }}" class="image-size preview-file-comment"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            <hr style="border: 1px solid #ccc;">
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div> 
+</div>
+</div>
+<script>
+    // Gắn sự kiện click vào nút xóa
+        const deleteButtons = document.querySelectorAll('.delete-post');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const postId = button.dataset.postId;
+                deletePost(postId);
+            });
+        });
+
+        // Hàm xóa bài viết
+        function deletePost(postId) {
+            fetch(`/delete-post/${postId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Xóa bài viết khỏi giao diện ngay lập tức
+                    const postElement = document.querySelector(`[data-post-id="${postId}"]`).parentElement;
+                    postElement.remove(); // Xóa phần tử sau khoảng thời gian nhỏ
+                    location.reload();
+                } else {
+                    console.error('Có lỗi xảy ra khi xóa bài viết');
+                }
+            })
+            .catch(error => {
+                console.error('Có lỗi xảy ra khi xóa bài viết:', error);
+            });
+        }
+    //Like post
+    document.addEventListener("DOMContentLoaded", function() {
+        const likeForms = document.querySelectorAll(".like-form");
+        likeForms.forEach(form => {
+            form.addEventListener("submit", function(event) {
+                event.preventDefault();
+                const postID = this.querySelector('input[name="post_id"]').value;
+                const csrfToken = this.querySelector('input[name="csrfmiddlewaretoken"]').value;
+                const likeButton = this.querySelector('.like-button');
+    
+                let isLiked = likeButton.classList.contains('liked');
+                const likeCountElement = this.querySelector('.like-count');
+    
+                fetch("/like_post/", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: new URLSearchParams({ post_id: postID, is_liked: isLiked }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        if (isLiked) {
+                            
+                            likeButton.classList.remove('liked');
+                            likeCountElement.textContent = data.likes;
+                        } else {
+                            
+                            likeButton.classList.add('liked');
+                            likeCountElement.textContent = data.likes;
+                        }
+                    } else {
+                        console.error(data.error);
+                    }
+                });
+            });
+        });
+    });
+    //File input new post
+    document.getElementById('file-input').addEventListener('change', function() {
+        var fileInput = this;
+        var previewContainer = document.getElementById('preview-container');
+        // previewContainer.innerHTML = ''; // Xóa bỏ các hình ảnh đã hiển thị trước đó
+
+        if (fileInput.files && fileInput.files.length > 0) {
+            for (var i = 0; i < fileInput.files.length; i++) {
+            var file = fileInput.files[i];
+            var reader = new FileReader();
+
+            reader.onload = (function(file) {
+                return function(e) {
+                var imgContainer = document.createElement('div');
+                imgContainer.classList.add('preview-image-container');
+
+                var img = document.createElement('img');
+                img.src = e.target.result;
+                img.classList.add('preview-image');
+                imgContainer.appendChild(img);
+
+                var closeButton = document.createElement('span');
+                closeButton.innerHTML = 'x';
+                closeButton.classList.add('close-button');
+                imgContainer.appendChild(closeButton);
+
+                closeButton.addEventListener('click', function() {
+                    imgContainer.parentNode.removeChild(imgContainer);
+                });
+
+                previewContainer.appendChild(imgContainer);
+                };
+            })(file);
+
+            reader.readAsDataURL(file);
+            }
+        }
+        });
+   
+    // Xóa hình ảnh khi nhấp vào dấu "x"
+        var container = document.getElementById('preview-container');
+        container.addEventListener('click', function(event) {
+            if (event.target.classList.contains('close-button')) {
+            var image = event.target.parentNode;
+            container.removeChild(image);
+            }
+        });
+
+        // Tạo dấu "x" trên đầu hình ảnh
+        var images = document.querySelectorAll('.preview-image');
+        images.forEach(function(image) {
+            var closeButton = document.createElement('span');
+            closeButton.innerHTML = 'x';
+            closeButton.classList.add('close-button');
+            image.appendChild(closeButton);
+        });
+        
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% comment %} Comment {% endcomment %}
+<script>
+    $(document).ready(function () {
+        // Xử lý sự kiện khi form comment được gửi
+        $(".comment-form").submit(function (e) {
+            e.preventDefault();
+            const form = $(this);
+            const postId = form.data("post-id");
+            const content = form.find('input[name="content"]').val();
+            
+           
+            const imageInput = form.find('input[name="image_comment"]');
+            const imageData = imageInput.prop('files');
+            
+            const videoInput = form.find('input[name="video_comment"]');
+            const videoData = videoInput.prop('files');
+    
+            
+            const formData = new FormData();
+            formData.append('content', content);
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+              // Xử lý nhiều hình ảnh
+            for (let i = 0; i < imageData.length; i++) {
+                formData.append('image_comment', imageData[i]);
+            }
+
+            // Xử lý nhiều video
+            for (let i = 0; i < videoData.length; i++) {
+                formData.append('video_comment', videoData[i]);
+            }
+    
+            
+            $.ajax({
+                url: `/add_comment/${postId}/`,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    const scrollPosition = $(window).scrollTop();
+                    form.find('input[name="content"]').val("");
+                    
+                    location.reload(function () {
+                        $(window).scrollTop(scrollPosition);
+                    });
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    // Xử lý lỗi nếu cần thiết
+                    console.error("Error adding comment:", errorThrown);
+                }
+            });
+        });
+    });
+    
+    </script>
+    
+{% comment %} Reply comment {% endcomment %}
+<script>
+    const csrfToken = '{{ csrf_token|escapejs }}';
+    // Rest of your JavaScript code
+</script>
+<script>
+    $(document).ready(function() {
+        $(".reply-button").click(function() {
+            var commentId = $(this).data("comment-id");
+            $("#reply-form-" + commentId).toggle();
+        });
+        /*
+        $(".reply-form").submit(function(e) {
+            e.preventDefault();
+            const form = $(this);
+            var commentId = $(this).data("comment-id");
+            const content = form.find('input[name="reply_content"]').val();
+        
+            const formData = new FormData();
+            formData.append("content", content);
+            formData.append("csrfmiddlewaretoken", csrfToken); 
+        
+            // Gửi yêu cầu fetch đến server
+            fetch(`/add_reply/${commentId}/`, {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                const scrollPosition = $(window).scrollTop();
+                location.reload();
+                $(window).scrollTop(scrollPosition);
+                form.find('input[name="content"]').val("");
+            });
+        });
+        */
+    });
+    
+</script>
+{% comment %} Like reply {% endcomment %}
+<script>
+    // Like reply
+    document.addEventListener("DOMContentLoaded", function() {
+        const likeButtons = document.querySelectorAll(".like-button-reply");
+        likeButtons.forEach(likeButton => {
+            likeButton.addEventListener("click", function(event) {
+                event.preventDefault();
+                const replyID = this.getAttribute('data-reply-id');
+                const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+    
+                const isLiked = this.classList.contains('liked');
+                const likeCountElement = this.nextElementSibling; 
+                fetch(`/like_reply/${replyID}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: new URLSearchParams({ is_liked: isLiked }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                   
+                        likeCountElement.textContent = data.likes;
+                   
+                });
+            });
+        });
+    });
+        // Like comment
+        document.addEventListener("DOMContentLoaded", function() {
+            const likeButtons = document.querySelectorAll(".like-button-comment");
+            likeButtons.forEach(likeButton => {
+                likeButton.addEventListener("click", function(event) {
+                    event.preventDefault();
+                    const commentID = this.getAttribute('data-like-comment-id'); 
+                    const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+                    const isLiked = this.classList.contains('liked');
+                    const likeCountElement = likeButton.querySelector('.like-count-comment');
+                    fetch(`/like_comment/${commentID}/`, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": csrfToken
+                        },
+                        body: new URLSearchParams({ is_liked: isLiked }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        likeCountElement.textContent = data.likes;
+                    });
+                });
+            });
+        });
+        
+       
+    </script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+        var fileUploadButton = document.getElementById('fileUploadButton');
+        var fileInput = document.getElementById('fileInput');
+        var selectedImage = document.getElementById('selectedImage');
+
+        fileUploadButton.addEventListener('click', function () {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', function () {
+            var selectedFile = fileInput.files[0];
+            if (selectedFile) {
+                // Hiển thị hình ảnh đã chọn
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    selectedImage.src = e.target.result;
+                    selectedImage.style.display = 'block';
+                };
+                reader.readAsDataURL(selectedFile);
+
+                // Đặt tên tệp đã chọn vào trường input text
+                var replyContent = document.querySelector('.reply-form input[name="reply_content"]');
+                replyContent.value = selectedFile.name;
+            }
+        });
+    });
+
+    
+
+    </script>
+    <script>
+        var scrollPosition = localStorage.getItem('scrollPosition');
+        if (scrollPosition) {
+            window.scrollTo(0, scrollPosition);
+            localStorage.removeItem('scrollPosition'); // Xóa dữ liệu lưu trữ sau khi sử dụng
+        }
+    
+        
+        document.getElementById('send-button').addEventListener('click', function() {
+            localStorage.setItem('scrollPosition', window.scrollY);
+        });
+    </script>
+    
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function() {
+          // Lặp qua tất cả các phần tử có id là "postContent"
+          $("#content_video p").each(function() {
+            var postContent = $(this).html();
+      
+            // Kiểm tra xem nội dung có chứa URL của YouTube hay không
+            if (postContent.match(/https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_\-]+)&?[^ ]*/g)) {
+              // Thực hiện thay thế URL YouTube bằng thẻ iframe
+              postContent = postContent.replace(/https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_\-]+)&?[^ ]*/g, '<iframe width="610" height="406" src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe>');
+            }
+      
+            // Cập nhật nội dung của phần tử
+            $(this).html(postContent);
+          });
+        });
+      </script>
+      
+    <script>
+        document.getElementById("open-video-selector").addEventListener("click", function(event) {
+            event.preventDefault(); 
+        
+            // Kích hoạt sự kiện click trên thẻ "input" ẩn
+            var videoInput = document.getElementById("video-input");
+            videoInput.click();
+        });
+        
+    </script>
+    <style>
+        .video-container {
+            position: relative;
+        }
+    
+        .delete-button {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $('#video-input').change(function() {
+                var videos = $(this)[0].files;
+                $('#preview-container').empty();
+                for (var i = 0; i < videos.length; i++) {
+                    var videoFile = videos[i];
+                    var videoURL = URL.createObjectURL(videoFile);
+                    var videoContainer = document.createElement('div');
+                    videoContainer.classList.add('video-container');
+                    var videoElement = document.createElement('video');
+                    videoElement.controls = true;
+                    videoElement.width = 280;
+                    videoElement.height = 200;
+                    var sourceElement = document.createElement('source');
+                    sourceElement.src = videoURL;
+                    sourceElement.type = 'video/mp4';
+                    videoElement.appendChild(sourceElement);
+                    var deleteButton = document.createElement('button');
+                    deleteButton.innerHTML = 'x';
+                    deleteButton.classList.add('delete-button');
+                    deleteButton.addEventListener('click', (function(videoContainer) {
+                        return function() {
+                            videoContainer.remove();
+                        };
+                    })(videoContainer));
+        
+                    // Thêm video và nút xóa vào container
+                    videoContainer.appendChild(videoElement);
+                    videoContainer.appendChild(deleteButton);
+        
+                    // Thêm container vào khung xem trước
+                    $('#preview-container').append(videoContainer);
+                }
+            });
+        });
+        </script>
+           
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('.file-input-comment').forEach(function (fileInput) {
+                    fileInput.addEventListener('change', function (event) {
+                        var postId = fileInput.getAttribute('data-post-id');
+                        var fileUploadButton = document.getElementById('fileUploadButtonComment-' + postId);
+                        handleFileInputChange(fileInput);  // Corrected line
+                    });
+                });
+            });
+            
+            function handleFileInputChange(fileInput) {
+                console.log('handleFileInputChange called');
+                var postId = fileInput.getAttribute('data-post-id');
+                var previewContainer = document.getElementById(`preview-file-comment-${postId}`);
+            
+                if (!previewContainer) {
+                    console.error('Preview container not found. postId:', postId);
+                    return;
+                }
+            
+                previewContainer.innerHTML = '';
+            
+                if (fileInput.files && fileInput.files.length > 0) {
+                    Array.from(fileInput.files).forEach(function (file) {
+                        var reader = new FileReader();
+            
+                        reader.onload = function (e) {
+                            var imgContainer = document.createElement('div');
+                            imgContainer.classList.add('preview-image-container');
+            
+                            var img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.classList.add('preview-image');
+                            imgContainer.appendChild(img);
+            
+                            var closeButton = document.createElement('span');
+                            closeButton.innerHTML = 'x';
+                            closeButton.classList.add('close-button');
+                            imgContainer.appendChild(closeButton);
+            
+                            closeButton.addEventListener('click', function () {
+                                imgContainer.parentNode.removeChild(imgContainer);
+                            });
+            
+                            previewContainer.appendChild(imgContainer);
+                        };
+            
+                        reader.readAsDataURL(file);
+                    });
+                }
+            }
+        </script> 
+       
+        <script>
+            $(document).ready(function() {
+                $('.video-input').change(function() {
+                    console.log('Change event triggered');
+                    var videos = $(this)[0].files;
+                    console.log('Number of files:', videos.length);
+                    var postId = $(this).data('post-id');
+                    var previewContainer = $('#preview-file-comment-' + postId);
+            
+                    previewContainer.empty();
+                    for (var i = 0; i < videos.length; i++) {
+                        var videoFile = videos[i];
+                        var videoURL = URL.createObjectURL(videoFile);
+                        var videoContainer = document.createElement('div');
+                        videoContainer.classList.add('video-container');
+                        var videoElement = document.createElement('video');
+                        videoElement.controls = true;
+                        videoElement.width = 280;
+                        videoElement.height = 200;
+                        var sourceElement = document.createElement('source');
+                        sourceElement.src = videoURL;
+                        videoContainer.style.marginTop = '10px';
+                        sourceElement.type = 'video/mp4';
+                        videoElement.appendChild(sourceElement);
+                        var deleteButton = document.createElement('button');
+                        deleteButton.innerHTML = 'x';
+                        deleteButton.classList.add('delete-button');
+                        deleteButton.addEventListener('click', (function(videoContainer) {
+                            return function() {
+                                videoContainer.remove();
+                            };
+                        })(videoContainer));
+                        videoContainer.appendChild(videoElement);
+                        videoContainer.appendChild(deleteButton);
+                        previewContainer.append(videoContainer); 
+                    }
+                });
+            });
+            
+        </script>
+        <style>
+            #dropdown-toggle {
+                display: none; 
+            }
+            </style>            
+       
+           <script>
+          $(document).on('click', '.delete-comment-link', function() {
+    var commentId = $(this).data('comment-id');
+    var targetElement = $(this).data('target-element'); // Đây là vị trí trỏ chuột hiện tại
+
+    $.ajax({
+        url: '/delete-comment/' + commentId + '/',
+        method: 'POST',
+        data: { csrfmiddlewaretoken: csrf_token },
+        success: function(data) {
+
+            $(targetElement).remove();
+        }
+    });
+});
+
+</script>
+<script>
+function editComment(commentId) {
+    var commentContentElement = $('#comment_content_' + commentId);
+    var commentContent = commentContentElement.text();
+
+    var inputElement = document.createElement('input');
+    inputElement.type = 'text';
+    inputElement.value = commentContent;
+
+    commentContentElement.empty();
+    commentContentElement.append(inputElement);
+
+    var updateButton = document.createElement('button');
+    updateButton.className = 'btn btn-primary';
+    updateButton.innerText = 'Update';
+    updateButton.onclick = function () {
+        var updatedContent = inputElement.value;
+        updateComment(commentId, updatedContent);
+    };
+
+    var cancelButton = document.createElement('button');
+    cancelButton.className = 'btn btn-danger';
+    cancelButton.innerText = 'Cancel';
+    cancelButton.onclick = function () {
+        commentContentElement.text(commentContent);
+        addEditCancelButtons(commentId);
+    };
+
+    commentContentElement.append(updateButton);
+    commentContentElement.append(cancelButton);
+
+    var editButton = $('.dropdown-item-edit-' + commentId);
+    if (editButton) {
+        editButton.hide();
+    }
+}
+
+function addEditCancelButtons(commentId) {
+    var commentContentElement = $('#comment_content_' + commentId);
+
+    var updateButton = commentContentElement.find('button');
+    if (updateButton) {
+        updateButton.remove();
+    }
+
+    var editButton = $('.dropdown-item-edit-' + commentId);
+    if (editButton) {
+        editButton.show();
+    }
+}
+
+function updateComment(commentId, updatedContent) {
+    $.ajax({
+        url: `/edit_comment/${commentId}/`,
+        type: 'POST',
+        data: {
+            new_content: updatedContent,
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+        },
+        success: function () {
+            $('#comment_content_' + commentId).text(updatedContent);
+            addEditCancelButtons(commentId);
+        },
+        error: function () {
+            console.error('Error updating comment');
+        }
+    });
+}
+</script>
+<script>
+function editReply(replyID) {
+    var replyContentElement = $('#reply_content_' + replyID);
+    var replyContent = replyContentElement.text();
+
+    var inputElement = document.createElement('input');
+    inputElement.type = 'text';
+    inputElement.value = replyContent;
+
+    replyContentElement.empty();
+    replyContentElement.append(inputElement);
+
+    var updateButton = document.createElement('button');
+    updateButton.className = 'btn btn-primary';
+    updateButton.innerText = 'Update';
+    updateButton.onclick = function () {
+        var updatedContent = inputElement.value;
+        updateReply(replyID, updatedContent);
+    };
+
+    var cancelButton = document.createElement('button');
+    cancelButton.className = 'btn btn-danger';
+    cancelButton.innerText = 'Cancel';
+    cancelButton.onclick = function () {
+        replyContentElement.text(replyContent);
+        addEditCancelButtons(replyID);
+    };
+
+    replyContentElement.append(updateButton);
+    replyContentElement.append(cancelButton);
+
+    var editButton = $('.dropdown-item-edit-' + replyID);
+    if (editButton) {
+        editButton.hide();
+    }
+}
+
+function addEditCancelButtons(replyID) {
+    var replyContentElement = $('#reply_content_' + replyID);
+
+    var updateButton = replyContentElement.find('button');
+    if (updateButton) {
+        updateButton.remove();
+    }
+
+    var editButton = $('.dropdown-item-edit-' + replyID);
+    if (editButton) {
+        editButton.show();
+    }
+}
+
+function updateReply(replyID, updatedContent) {
+    $.ajax({
+        url: `/edit_reply/${replyID}/`,
+        type: 'POST',
+        data: {
+            new_content: updatedContent,
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+        },
+        success: function () {
+            $('#reply_content_' + replyID).text(updatedContent);
+            addEditCancelButtons(replyID);
+        },
+        error: function () {
+            console.error('Error updating reply');
+        }
+    });
+}
+</script>
+<script>
+function deleteComment(commentId) {
+    if (confirm('Are you sure you want to delete this comment?')) {
+        
+        var scrollPosition = window.scrollY;
+
+        $.ajax({
+            url: '/delete_comment/' + commentId + '/',  
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+            },
+            success: function () {
+                location.reload();
+                window.scrollTo(0, scrollPosition);
+            },
+            error: function () {
+                console.error('Error deleting comment');
+            }
+        });
+    }
+}
+</script>
+<script>
+function deleteReply(replyID) {
+    if (confirm('Are you sure you want to delete this comment?')) {
+        
+        var scrollPosition = window.scrollY;
+
+        $.ajax({
+            url: '/delete_reply/' + replyID + '/',  
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+            },
+            success: function () {
+                location.reload();
+                window.scrollTo(0, scrollPosition);
+            },
+            error: function () {
+                console.error('Error deleting comment');
+            }
+        });
+    }
+}
+</script>
+<script>
+function addReply(commentId) {
+    var replyContent = $('#reply-form-' + commentId + ' input[name="reply_content"]').val();
+
+    $.ajax({
+        url: '/add_reply/' + commentId + '/',
+        type: 'POST',
+        data: {
+            reply_content: replyContent,
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+        },
+        success: function () { 
+            var scrollPosition = window.scrollY;
+            location.reload();
+            window.scrollTo(0, scrollPosition);
+        },
+        error: function () {
+            console.error('Error adding reply');
+        }
+    });
+}
+</script>
+
+<script>
+function hidePost(postId) {
+
+    var confirmation = confirm('Are you sure you want to hide this post?');
+
+    if (confirmation) {
+        fetch(`/hide_post/${postId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Ẩn phần tử HTML của bài đăng khi ẩn thành công
+                    var postElement = document.getElementById(`post-${postId}`);
+                    if (postElement) {
+                        postElement.style.display = 'none';
+                    }
+                    alert('Post hidden successfully!');
+                } else {
+                    // Xử lý trường hợp ẩn bài đăng không thành công
+                    alert('Failed to hide post.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while hiding the post.');
+            });
+    }
+}    
+</script>
+{% endblock %}

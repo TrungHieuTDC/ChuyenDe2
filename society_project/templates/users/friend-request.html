@@ -1,0 +1,71 @@
+{% extends 'society/index.html' %}
+{% block body %}
+{% load custom_filters %}
+{% load static %}      
+<div id="content-page" class="content-page">
+      <div class="container">
+               <div class="row">
+                  <div class="col-sm-12">
+                     <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                           <div class="header-title">
+                              <h4 class="card-title">Friend Request</h4>
+                           </div>
+                        </div>
+                        <div class="card-body">
+                           <ul class="request-list list-inline m-0 p-0">
+                            {% for friend_request in friend_requests %}
+                              <li class="d-flex align-items-center  justify-content-between flex-wrap">
+                                 <div class="user-img img-fluid flex-shrink-0">
+                                   <img src="{{ friend_request.user.profile.avatar.url }}" alt="story-img" class="rounded-circle avatar-40">
+                                 </div>
+                                 <div class="flex-grow-1 ms-3">
+                                   <h6>{{ friend_request.user.last_name }} {{ friend_request.user.first_name }}</h6>
+                                    <p class="mb-0">{{ friend_request.user.friendship.count }}</p>
+                                 </div>
+                                 <div class="d-flex align-items-center mt-2 mt-md-0">
+                                    <div class="confirm-click-btn">
+                                       <a href="{% url 'social_profile:accept_friend_request' friend_request.user.id %}" class="me-3 btn btn-primary rounded confirm-btn">Confirm</a>
+                                       <a href="../app/profile.html" class="me-3 btn btn-primary rounded request-btn" style="display: none;">View All</a>
+                                    </div>
+                                    <a href="{% url 'social_profile:reject_friend_request' friend_request.user.id %}" class="btn btn-secondary rounded" data-extra-toggle="delete" data-closest-elem=".item">Remove</a>                                    
+                              </li>
+                            {% endfor %}
+                           </ul>
+                        </div>
+                     </div>
+                     <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                           <div class="header-title">
+                              <h4 class="card-title">People You May Know {{potential_friends.count}}</h4>
+                           </div>
+                        </div>
+                        <div class="card-body">
+                            <ul class="request-list m-0 p-0">
+                                {% for potential_friend in potential_friends %}
+                                
+                                    <li class="d-flex align-items-center flex-wrap">
+                                        <div class="user-img img-fluid flex-shrink-0">
+                                            <img src="{% if potential_friend.profile.avatar %}{{ potential_friend.profile.avatar.url }}{% else %}../assets/images/default-avatar.jpg{% endif %}" alt="user-avatar" class="rounded-circle avatar-40">
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6>{{ potential_friend.last_name }} {{ potential_friend.first_name }}</h6>
+                                            <p class="mb-0">{{ potential_friend.friends.count }} friends</p>
+                                        </div>
+                                        <div class="d-flex align-items-center mt-2 mt-md-0">
+                                            <a href="{% url 'social_profile:send_friend_request' potential_friend.id %}" class="me-3 btn btn-primary rounded"><i class="ri-user-add-line me-1"></i>Add Friend</a>
+                                        </div>
+                                    </li>
+                              
+                                {% endfor %}
+                            </ul>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  
+{%endblock%}

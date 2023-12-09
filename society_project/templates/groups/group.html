@@ -1,0 +1,86 @@
+{% extends 'society/index.html' %}
+{% block body %}
+{% load static %}
+{% block notifications %}
+    {{ block.super }}
+{% endblock %}
+<div class="header-for-bg">
+    <div class="background-header position-relative">
+        <img src="{% static 'assets/images/page-img/profile-bg7.jpg' %}" class="img-fluid w-100" alt="header-bg">
+        <div class="title-on-header">
+            <div class="data-block">
+                <h2>Groups</h2>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- Page Content  -->      
+    <div id="content-page" class="content-page">
+    <div class="container">
+    <div class="d-grid gap-3 d-grid-template-1fr-19">
+    {% for group in groups %}
+    <div class="card mb-0">
+        <div class="top-bg-image">
+            <img src="/media/{{ group.background_image }}" class=" w-100 "width="317px" height="79px" alt="group-bg">
+        </div>
+        <div class="card-body text-center">
+            <div class="group-icon">
+                <img src="/media/{{ group.avatar }}" alt="profile-img" class="rounded-circle img-fluid avatar-120">
+            </div>
+            <div class="group-info pt-3 pb-3">
+                <h4><a href="{% url 'social_network:group_detail' group.slug %}">{{ group.name }}</a></h4>
+                <p>{{group.description}}</p>
+            </div>
+            <div class="group-details d-inline-block pb-3">
+                <ul class="d-flex align-items-center justify-content-between list-inline m-0 p-0">
+                    <li class="pe-3 ps-3">
+                        <p class="mb-0">Post</p>
+                        <h6>{{ group.num_posts }}</h6>
+                    </li>
+                    <li class="pe-3 ps-3">
+                        <p class="mb-0">Member</p>
+                        <h6>{{ group.num_members }}</h6>
+                    </li>
+                    <li class="pe-3 ps-3">
+                        <p class="mb-0">Visit</p>
+                        <h6>{{ group.visits }}</h6>
+                    </li>
+                </ul>
+            </div>
+            <div class="group-member mb-3">
+                <div class="iq-media-group">
+                    {%if group.members.all%}
+                    {% for member in group.members.all %}
+                    <a href="#" class="iq-media">
+                        <img class="img-fluid avatar-40 rounded-circle" src="{{ member.profile.avatar.url }}" alt="">
+                    </a>
+                    {%endfor%}
+                    {%else%}
+                    <img class="img-fluid avatar-40 rounded-circle" src="{% static 'assets/images/iduck_1.png' %}" alt="">
+                    {%endif%}
+                </div>
+            </div>
+            {% if request.user in group.admins.all %}
+                <a href="{% url 'social_network:group_detail' group.slug %}" class="btn btn-primary d-block w-100">View group</a>
+            {% elif group.id in user_pending_group_ids %}
+                <a href="{% url 'social_network:group_detail' group.slug %}" class="btn btn-warning d-block w-100">Pending</a>
+            {% elif group.id not in user_groups %}
+                    <form method="post" action="{% url 'social_network:join_group' group.slug %}">
+                        {% csrf_token %}  
+                        <button type="submit" class="btn btn-primary d-block w-100">Join</button>
+                    </form>
+            {% else %}
+                <a href="{% url 'social_network:group_detail' group.slug %}" class="btn btn-success d-block w-100">Joined</a> 
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+  
+</div>
+</div>
+{% endblock %}
+
+
+
+
+

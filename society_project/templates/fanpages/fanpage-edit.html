@@ -1,0 +1,261 @@
+{% extends 'society/index.html' %}
+{% block body %}
+{% load custom_filters %}
+{% load static %}
+<style>
+    .header-nav {
+        background-color: #f2f2f2;
+    }
+    .toggle-button {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        text-align: center;
+        text-decoration: none;
+        cursor: pointer;
+        background-color: #0077cc;
+        color: #ffffff;
+        border: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+    
+    /* Style khi nút được bật (active) */
+    .toggle-button.active {
+        background-color: #ff0000; /* Màu đỏ khi bật */
+    }
+</style>
+<div id="content-page" class="content-page">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="iq-edit-list">
+                            <ul class="iq-edit-profile row nav nav-pills">
+                                <li class="col-md-6 p-0">
+                                    <a class="nav-link active" data-bs-toggle="pill" href="#personal-information">
+                                        Personal Information
+                                    </a>
+                                </li>
+                                <li class="col-md-6 p-0">
+                                    <a class="nav-link" data-bs-toggle="pill" href="#chang-pwd">
+                                        Page Authorization 
+                                    </a>
+                                </li>
+                               
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="iq-edit-list-data">
+                    <div class="tab-content">
+                        <div class="tab-pane fade active show" id="personal-information" role="tabpanel">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between">
+                                    <div class="header-title">
+                                        <h4 class="card-title">Edit background</h4>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <form method="post" enctype="multipart/form-data" action="{% url 'social_fanpage:edit_fanpage' fanpage.slug %}">
+                                        {% csrf_token %}
+                                        <div class="form-group row align-items-center">
+                                            <div class="col-md-12">
+                                                <div class="card" style="align-items: center">
+                                                    <div class="card-body profile-page p-0">
+                                                        <div class="profile-header">
+                                                            <div class="position-relative" style="align-items: center">
+                                                                {% if fanpage.cover_image.url != null%}
+                                                                <img style="width: 944px; height: 500px" id="profile-pic-background" src="{{ fanpage.cover_image.url }}" alt="profile-bg" class="rounded img-fluid">
+                                                                {% else %}
+                                                                <img style="width: 944px; height: 500px" id="profile-pic-background" src="{% static 'assets/images/page-img/profile-bg1.jpg' %}" alt="profile-bg" class="rounded img-fluid">
+                                                                {% endif %}
+                                                                <ul class="header-nav list-inline d-flex flex-wrap justify-end p-0 m-0">
+                                                                    <i style="background-color: black;" id="edit-avatar-background" class="ri-pencil-line text-white">Edit</i>
+                                                                    <input id="avatar-input-background" name="background" class="visually-hidden"  type="file" accept="image/*"/>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                 </div>
+                                            </div>
+                                        </div>
+                                        <div class="header-title">
+                                            <h4 class="card-title">Edit avatar fanpage</h4>
+                                        </div>
+                                        <div class="form-group row align-items-center">
+                                            <div class="col-md-12">
+                                                <div class="profile-img-edit">
+                                                    <img style="width:150px; height:150px;" id="profile-pic" class="profile-pic" src="{{ fanpage.avatar.url }}" alt="profile-pic">
+                                                    <div class="p-image">
+                                                        <i id="edit-avatar" class="ri-pencil-line text-white"></i>
+                                                        <input id="avatar-input" name="avatar" class="file-upload visually-hidden" type="file" accept="image/*"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="header-title">
+                                            <h4 class="card-title">Edit information fanpage</h4>
+                                        </div>
+                                        <div class="row align-items-center">
+                                            <div class="form-group col-sm-12">
+                                                <label for="fname" class="form-label">Name Fanpage:</label>
+                                                <input value="{{ fanpage.name }}" name="name" type="text" class="form-control" id="fname" placeholder="Name...">
+                                            </div>
+                                            
+                                        </div>
+                                        <div class="row align-items-center">
+                                            
+                                            <div class="form-group col-sm-12">
+                                                <label for="bio" class="form-label">Description:</label>
+                                                <textarea name="description" class="form-control" rows="3" placeholder="Enter your bio">{{ fanpage.description }}</textarea>
+                                            </div>
+                                        </div>
+                                        <button onclick="return confirm('Are you sure you want to save?')" type="submit" class="btn btn-primary me-2">Submit</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="chang-pwd" role="tabpanel">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between">
+                                <div class="iq-header-title">
+                                    <h4 class="card-title">Set Admin </h4>
+                                </div>
+                                </div>
+                                <div class="card-body">
+                                    <form method="post" action="{% url 'social_fanpage:admin_management' fanpage.slug %}">
+                                        {% csrf_token %}
+                                        <label for="admin">Choose admin:</label>
+                                        <select name="admin">
+                                            <option value="" selected>Choose user for remove</option>
+                                            {% for friend in friends %}
+                                            {% if friend.user.id not in admin_ids %}
+                                                <option value="{{ friend.user.id }}">{{ friend.user.username }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                        </select>
+                                        <button type="submit" class="btn btn-primary me-2">Submit</button>
+                                    </form>
+                                </div>
+                                <div class="card-header d-flex justify-content-between">
+                                    <div class="iq-header-title">
+                                        <h4 class="card-title">Remove Admin </h4>
+                                    </div>
+                                    </div>
+                                <div class="card-header d-flex justify-content-between">
+                                    <div class="iq-header-title">
+                                        {% for admin in fanpage.admins.all %}
+                                        <h4 class="card-title">Remove Admin {{admin.username}}</h4>
+                                        {% endfor %}
+                                    </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <form method="post" action="{% url 'social_fanpage:remove_admin_management' fanpage.slug %}">
+                                            {% csrf_token %}
+                                            <label for="admin">Choose admin:</label>
+                                            <select name="admin">
+                                                <option value="" selected>Choose admin for remove</option>
+                                                {% for admin in fanpage.admins.all %}
+                                                {% if friend.user.id not in admin_ids %}
+                                                    <option value="{{ admin.id }}">{{ admin.username }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                            </select>
+                                            <button type="submit" class="btn btn-primary me-2">Submit</button>
+                                        </form>
+                                    </div>
+                                    <div class="card-header d-flex justify-content-between">
+                                        <div class="iq-header-title">
+                                            <h4 class="card-title">Hidden page </h4>
+                                    </div>
+                                    </div>
+                                
+                                    <div class="card-body">
+                                        <form method="post" action="{% url 'social_fanpage:close_fanpage' fanpage.slug %}">
+                                            {% csrf_token %}
+                                            
+                                            <input {% if fanpage.is_hidden %}checked{% endif %} type="checkbox" name="is_hidden" id="is_hidden" >
+                                            <label for="is_hidden">Close Fanpage</label>
+                                            <button type="submit" class="btn btn-primary me-2">Submit</button>
+                                        </form>
+                                    </div>
+                                    {% if request.user.id == fanpage.user.id%}
+                                    <div class="card-header d-flex justify-content-between">
+                                        <div class="iq-header-title">
+                                            <h4 class="card-title">Delete page </h4>
+                                    </div>
+                                    </div>
+                                
+                                    <div class="card-body">
+                                        
+                                        <form method="post" action="{% url 'social_fanpage:delete_fanpage' fanpage.slug %}">
+                                            {% csrf_token %}
+                                            <label for="is_hidden">Are you sure to want delete fanpage?</label>
+                                            <button  type="submit" class="btn btn-danger me-2" onclick="return confirm('Are you sure you want to delete this fanpage?')">Delete</button>
+                                        </form>
+                                        
+                                    </div>
+                                    {%endif%}
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+      </div>
+    </div>
+    <script>
+        document.getElementById('toggleButton').addEventListener('click', function() {
+            this.classList.toggle('active');
+            // Thêm code xử lý khi nút được bật tắt ở đây
+        });
+        document.getElementById('edit-avatar').addEventListener('click', function () {
+            document.getElementById('avatar-input').click();
+        });
+    
+        // Assuming you want to update the profile pic immediately after selecting a file
+        document.getElementById('avatar-input').addEventListener('change', function (event) {
+            const profilePic = document.getElementById('profile-pic');
+            const fileInput = event.target;
+    
+            // Assuming the file input is for an image
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+    
+                reader.onload = function (e) {
+                    profilePic.src = e.target.result;
+                };
+    
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        });
+    </script>
+    <script>
+        document.getElementById('edit-avatar-background').addEventListener('click', function () {
+            document.getElementById('avatar-input-background').click();
+        });
+    
+        // Assuming you want to update the profile pic immediately after selecting a file
+        document.getElementById('avatar-input-background').addEventListener('change', function (event) {
+            const profilePicBackground = document.getElementById('profile-pic-background');
+            const fileInputBackground = event.target;
+    
+            // Assuming the file input is for an image
+            if (fileInputBackground.files && fileInputBackground.files[0]) {
+                const reader = new FileReader();
+    
+                reader.onload = function (e) {
+                    profilePicBackground.src = e.target.result;
+                };
+    
+                reader.readAsDataURL(fileInputBackground.files[0]);
+            }
+        });
+    </script>
+{% endblock%}

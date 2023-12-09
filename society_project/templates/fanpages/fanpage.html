@@ -1,0 +1,56 @@
+    
+{% extends 'society/index.html' %}
+{% block body %}
+{% load custom_filters %}
+{% load static %}
+<div class="header-for-bg">
+    <div class="background-header position-relative">
+        <img src="{% static 'assets/images/page-img/profile-bg7.jpg' %}" class="img-fluid w-100" alt="header-bg">
+        <div class="title-on-header">
+            <div class="data-block">
+                <h2>Fanpage</h2>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="content-page" class="content-page">
+        <div class="container">
+            <div class="row">
+                {% for fanpage in fanpages%}
+                <div class="col-md-6">
+                    <div class="card card-block card-stretch card-height">
+                        <div class="card-body profile-page p-0">
+                            <div class="profile-header-image">
+                                <div class="cover-container">
+                                    <img style="width:121px; height:121px;" src="{{ fanpage.cover_image.url }}" alt="profile-bg" class="rounded img-fluid w-100">
+                                </div>
+                                <div class="profile-info p-4">
+                                    <div class="user-detail">
+                                    <div class="d-flex flex-wrap justify-content-between align-items-start">
+                                        <div class="profile-detail d-flex">
+                                            <div class="profile-img pe-4">
+                                                <img style="width:121px; height:121px;" src="{{ fanpage.avatar.url }}" alt="profile-img" class="avatar-130 img-fluid" />
+                                            </div>
+                                            <div class="user-data-block">
+                                                <h4>
+                                                    <a href="{% url 'social_fanpage:fanpage_detail' fanpage.slug %}">{{ fanpage.name }}</a>
+                                                </h4>
+                                                <p>{{fanpage.description}}</p>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary"><a style="color: white" href="{% url 'social_fanpage:fanpage_detail' fanpage.slug %}">View fanpage</a></button>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {%endfor%}
+            </div>
+        </div>
+      </div>
+</div>
+{%endblock%}
+  
+ 
